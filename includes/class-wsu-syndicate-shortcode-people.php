@@ -28,6 +28,8 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * Display people from people.wsu.edu in a structured format using the
 	 * WP REST API.
 	 *
+	 * @since 1.0.0 Pulled from WSUWP Content Syndicate
+	 *
 	 * @param array $atts Attributes passed to the shortcode.
 	 *
 	 * @return string Content to display in place of the shortcode.
@@ -86,6 +88,8 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 	/**
 	 * Generate the HTML used for individual people when called with the shortcode.
+	 *
+	 * @since 1.0.0 Pulled from WSUWP Content Syndicate
 	 *
 	 * @param stdClass $person Data returned from the WP REST API.
 	 * @param string   $type   The type of output expected.
