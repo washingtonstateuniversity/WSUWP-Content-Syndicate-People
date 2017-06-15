@@ -74,10 +74,14 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$people = json_decode( $data );
 
 		$people = apply_filters( 'wsuwp_people_sort_items', $people, $atts );
+		
+		$inner_content = '';
 
 		foreach ( $people as $person ) {
-			$content .= $this->generate_item_html( $person, $atts['output'] );
+			$inner_content .= $this->generate_item_html( $person, $atts );
 		}
+		
+		$content .= apply_filters( 'wsuwp_people_inner_html', $inner_content, $atts );
 
 		$content .= '</div><!-- end wsuwp-people-wrapper -->';
 
@@ -92,11 +96,14 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @since 1.0.0 Pulled from WSUWP Content Syndicate
 	 *
 	 * @param stdClass $person Data returned from the WP REST API.
-	 * @param string   $type   The type of output expected.
+	 * @param array $atts Attributes passed to the shortcode.
 	 *
 	 * @return string The generated HTML for an individual person.
 	 */
-	private function generate_item_html( $person, $type ) {
+	private function generate_item_html( $person, $atts ) {
+		
+		$type = $atts['output'];
+		
 		if ( 'basic' === $type ) {
 			ob_start();
 			?>
@@ -118,6 +125,6 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			return $html;
 		}
 
-		return apply_filters( 'wsuwp_people_item_html', '', $person, $type );
+		return apply_filters( 'wsuwp_people_item_html', '', $person, $type, $atts );
 	}
 }
