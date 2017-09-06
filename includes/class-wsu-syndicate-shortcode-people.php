@@ -43,6 +43,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		}
 
 		$content = $this->get_content_cache( $atts, 'wsuwp_people' );
+
 		if ( $content ) {
 			return $content;
 		}
@@ -97,13 +98,28 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @return string The generated HTML for an individual person.
 	 */
 	private function generate_item_html( $person, $type ) {
+		// Cast the collection as an array to account for scenarios
+		// where it can sometimes come through as an object.
+		$photo_collection = (array) $person->photos;
+		$photo = false;
+
+		// Grab the first photo in a person's collection.
+		if ( ! empty( $photo_collection ) && isset( $photo_collection[0] ) ) {
+			$photo = $photo_collection[0]->thumbnail;
+		}
+
+		// Grab the legacy profile photo if the person's collection is empty.
+		if ( ! $photo && isset( $person->profile_photo ) ) {
+			$photo = $person->profile_photo;
+		}
+
 		if ( 'basic' === $type ) {
 			ob_start();
 			?>
 			<div class="wsuwp-person-container">
-				<?php if ( isset( $person->profile_photo ) && $person->profile_photo ) : ?>
+				<?php if ( $photo ) : ?>
 				<figure class="wsuwp-person-photo">
-					<img src="<?php echo esc_url( $person->profile_photo ); ?>" />
+					<img src="<?php echo esc_url( $photo ); ?>" />
 				</figure>
 				<?php endif; ?>
 				<div class="wsuwp-person-name"><?php echo esc_html( $person->title->rendered ); ?></div>
