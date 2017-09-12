@@ -218,7 +218,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			<div class="wsuwp-person-container">
 				<?php if ( $photo ) : ?>
 				<figure class="wsuwp-person-photo">
-					<img src="<?php echo esc_url( $photo ); ?>" />
+					<img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $person->title->rendered ); ?>" />
 				</figure>
 				<?php endif; ?>
 				<div class="wsuwp-person-name"><?php echo esc_html( $person->title->rendered ); ?></div>
