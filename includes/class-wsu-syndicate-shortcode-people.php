@@ -198,12 +198,16 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$photo_collection = (array) $person->photos;
 		$photo = false;
 
-		// Grab the first photo in a person's collection.
-		if ( ! empty( $photo_collection ) && isset( $photo_collection[0] ) ) {
-			$photo = $photo_collection[0]->thumbnail;
+		// Get the URL of the display photo.
+		if ( ! empty( $photo_collection ) ) {
+			if ( isset( $person->display_photo ) && isset( $photo_collection[ $person->display_photo ] ) ) {
+				$photo = $photo_collection[ $person->display_photo ]->thumbnail;
+			} elseif ( isset( $photo_collection[0] ) ) {
+				$photo = $photo_collection[0]->thumbnail;
+			}
 		}
 
-		// Grab the legacy profile photo if the person's collection is empty.
+		// Get the legacy profile photo URL if the person's collection is empty.
 		if ( ! $photo && isset( $person->profile_photo ) ) {
 			$photo = $person->profile_photo;
 		}
