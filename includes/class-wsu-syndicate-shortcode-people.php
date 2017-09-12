@@ -106,6 +106,8 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	/**
 	 * Sort people alphabetically by their last name.
 	 *
+	 * @since 1.0.2
+	 *
 	 * @param stdClass $a Object representing a person.
 	 * @param stdClass $b Object representing a person.
 	 *
