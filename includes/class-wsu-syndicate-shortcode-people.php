@@ -74,7 +74,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		$people = json_decode( $data );
 
-		$people = apply_filters( 'wsuwp_people_sort_items', $people, $atts );
+		$people = $this->sort_items( $people, $atts );
 
 		foreach ( $people as $person ) {
 			$content .= $this->generate_item_html( $person, $atts['output'] );
@@ -85,6 +85,36 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$this->set_content_cache( $atts, 'wsuwp_people', $content );
 
 		return $content;
+	}
+
+	/**
+	 * Sort the results of the REST request.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param array $people Items returned by the REST request.
+	 * @param array $atts   Attributes passed to the shortcode.
+	 *
+	 * @return array Sorted items.
+	 */
+	public function sort_items( $people, $atts ) {
+		usort( $people, array( $this, 'sort_alpha' ) );
+
+		return apply_filters( 'wsuwp_people_sort_items', $people, $atts );
+	}
+
+	/**
+	 * Sort people alphabetically by their last name.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param stdClass $a Object representing a person.
+	 * @param stdClass $b Object representing a person.
+	 *
+	 * @return int Whether person a's last name is alphabetically smaller or greater than person b's.
+	 */
+	public function sort_alpha( $a, $b ) {
+		return strcasecmp( $a->last_name, $b->last_name );
 	}
 
 	/**
