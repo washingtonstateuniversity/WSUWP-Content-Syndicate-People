@@ -200,7 +200,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		// Get the URL of the display photo.
 		if ( ! empty( $photo_collection ) ) {
-			if ( isset( $person->display_photo ) && isset( $photo_collection[ $person->display_photo ] ) ) {
+			if ( ! empty( $person->display_photo ) && isset( $photo_collection[ $person->display_photo ] ) ) {
 				$photo = $photo_collection[ $person->display_photo ]->thumbnail;
 			} elseif ( isset( $photo_collection[0] ) ) {
 				$photo = $photo_collection[0]->thumbnail;
