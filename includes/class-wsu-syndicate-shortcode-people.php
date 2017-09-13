@@ -38,6 +38,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$atts = $this->process_attributes( $atts );
 
 		$site_url = $this->get_request_url( $atts );
+
 		if ( ! $site_url ) {
 			return '<!-- wsuwp_people ERROR - an empty host was supplied -->';
 		}
@@ -74,6 +75,10 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		$people = json_decode( $data );
 
+		if ( 'people.wsu.edu' !== $site_url ) {
+			$people = $this->request_primary_profiles( $people, $count );
+		}
+
 		$people = $this->sort_items( $people, $atts );
 
 		foreach ( $people as $person ) {
@@ -85,6 +90,66 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$this->set_content_cache( $atts, 'wsuwp_people', $content );
 
 		return $content;
+	}
+
+	/**
+	 * Request the primary profiles for results from a site other than people.wsu.edu.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param array $people Items returned by the REST request.
+	 * @param array $count  The number of results to request.
+	 *
+	 * @return array
+	 */
+	public function request_primary_profiles( $people, $count ) {
+		$request_url = esc_url( $this->local_default_atts['host'] . '/' . $this->default_path . $this->local_default_atts['query'] );
+
+		if ( $count ) {
+			$request_url = add_query_arg( array(
+				'per_page' => absint( $count ),
+			), $request_url );
+		}
+
+		foreach ( $people as $person ) {
+			if ( isset( $person->primary_profile_id ) ) {
+				$request_url = add_query_arg( 'include[]', $person->primary_profile_id, $request_url );
+			}
+		}
+
+		$response = wp_remote_get( $request_url );
+
+		if ( is_wp_error( $response ) ) {
+			return $people;
+		}
+
+		$data = wp_remote_retrieve_body( $response );
+
+		if ( empty( $data ) ) {
+			return $people;
+		}
+
+		$primary_people = json_decode( $data );
+
+		// Recursively cast the results from the host site as an array.
+		$host_people_array = json_decode( wp_json_encode( $people ), true );
+
+		// Reindex the host site results by `primary_profile_id`.
+		$host_people = array_column( $host_people_array, null, 'primary_profile_id' );
+
+		foreach ( $primary_people as $index => $person ) {
+			$id = $person->id;
+
+			// Replace the primary profile link with the host site profile link.
+			$primary_people[ $index ]->link = $host_people[ $id ]['link'];
+
+			// Add the photo, title, and bio display options from the host site profile.
+			$primary_people[ $index ]->display_photo = $host_people[ $id ]['display_photo'];
+			$primary_people[ $index ]->display_title = $host_people[ $id ]['display_title'];
+			$primary_people[ $index ]->display_bio = $host_people[ $id ]['display_bio'];
+		}
+
+		return $primary_people;
 	}
 
 	/**
@@ -133,14 +198,34 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$photo_collection = (array) $person->photos;
 		$photo = false;
 
-		// Grab the first photo in a person's collection.
-		if ( ! empty( $photo_collection ) && isset( $photo_collection[0] ) ) {
-			$photo = $photo_collection[0]->thumbnail;
+		// Get the URL of the display photo.
+		if ( ! empty( $photo_collection ) ) {
+			if ( ! empty( $person->display_photo ) && isset( $photo_collection[ $person->display_photo ] ) ) {
+				$photo = $photo_collection[ $person->display_photo ]->thumbnail;
+			} elseif ( isset( $photo_collection[0] ) ) {
+				$photo = $photo_collection[0]->thumbnail;
+			}
 		}
 
-		// Grab the legacy profile photo if the person's collection is empty.
+		// Get the legacy profile photo URL if the person's collection is empty.
 		if ( ! $photo && isset( $person->profile_photo ) ) {
 			$photo = $person->profile_photo;
+		}
+
+		// Get the display title(s).
+		if ( ! empty( $person->working_titles ) ) {
+			if ( ! empty( $person->display_title ) ) {
+				$display_titles = explode( ',', $person->display_title );
+				foreach ( $display_titles as $display_title ) {
+					if ( isset( $person->working_titles[ $display_title ] ) ) {
+						$titles[] = $person->working_titles[ $display_title ];
+					}
+				}
+			} else {
+				$titles = $person->working_titles;
+			}
+		} else {
+			$titles = array( $person->position_title );
 		}
 
 		if ( 'basic' === $type ) {
@@ -149,13 +234,17 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			<div class="wsuwp-person-container">
 				<?php if ( $photo ) : ?>
 				<figure class="wsuwp-person-photo">
-					<img src="<?php echo esc_url( $photo ); ?>" />
+					<img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $person->title->rendered ); ?>" />
 				</figure>
 				<?php endif; ?>
 				<div class="wsuwp-person-name"><?php echo esc_html( $person->title->rendered ); ?></div>
-				<div class="wsuwp-person-position"><?php echo esc_html( $person->position_title ); ?></div>
+				<?php foreach ( $titles as $title ) { ?>
+				<div class="wsuwp-person-position"><?php echo esc_html( $title ); ?></div>
+				<?php } ?>
 				<div class="wsuwp-person-office"><?php echo esc_html( $person->office ); ?></div>
-				<div class="wsuwp-person-email"><?php echo esc_html( $person->email ); ?></div>
+				<div class="wsuwp-person-email">
+					<a href="mailto:<?php echo esc_attr( $person->email ); ?>"><?php echo esc_html( $person->email ); ?></a>
+				</div>
 			</div>
 			<?php
 			$html = ob_get_contents();
