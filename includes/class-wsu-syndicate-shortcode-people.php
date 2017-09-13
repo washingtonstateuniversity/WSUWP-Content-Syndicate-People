@@ -212,6 +212,22 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			$photo = $person->profile_photo;
 		}
 
+		// Get the display title(s).
+		if ( ! empty( $person->working_titles ) ) {
+			if ( ! empty( $person->display_title ) ) {
+				$display_titles = explode( ',', $person->display_title );
+				foreach ( $display_titles as $display_title ) {
+					if ( isset( $person->working_titles[ $display_title ] ) ) {
+						$titles[] = $person->working_titles[ $display_title ];
+					}
+				}
+			} else {
+				$titles = $person->working_titles;
+			}
+		} else {
+			$titles = array( $person->position_title );
+		}
+
 		if ( 'basic' === $type ) {
 			ob_start();
 			?>
@@ -222,7 +238,9 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				</figure>
 				<?php endif; ?>
 				<div class="wsuwp-person-name"><?php echo esc_html( $person->title->rendered ); ?></div>
-				<div class="wsuwp-person-position"><?php echo esc_html( $person->position_title ); ?></div>
+				<?php foreach ( $titles as $title ) { ?>
+				<div class="wsuwp-person-position"><?php echo esc_html( $title ); ?></div>
+				<?php } ?>
 				<div class="wsuwp-person-office"><?php echo esc_html( $person->office ); ?></div>
 				<div class="wsuwp-person-email"><?php echo esc_html( $person->email ); ?></div>
 			</div>
