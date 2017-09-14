@@ -75,7 +75,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		$people = json_decode( $data );
 
-		if ( 'people.wsu.edu' !== $site_url ) {
+		if ( 'people.wsu.edu' !== $site_url['host'] ) {
 			$people = $this->request_primary_profiles( $people, $count );
 		}
 
