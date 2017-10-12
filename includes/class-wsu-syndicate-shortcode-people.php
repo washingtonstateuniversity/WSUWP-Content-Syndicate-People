@@ -81,9 +81,15 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		$people = $this->sort_items( $people, $atts );
 
+		// html of profiles that's filtered before adding to content.
+		$inner_content = '';
+
 		foreach ( $people as $person ) {
-			$content .= $this->generate_item_html( $person, $atts['output'] );
+			$inner_content .= $this->generate_item_html( $person, $atts['output'] );
 		}
+
+		// Apply filters and add to content
+		$content .= apply_filters( 'wsuwp_people_items_html', $inner_content, $people, $atts );
 
 		$content .= '</div><!-- end wsuwp-people-wrapper -->';
 
