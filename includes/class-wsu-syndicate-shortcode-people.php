@@ -16,6 +16,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 */
 	public $local_extended_atts = array(
 		'classification' => '',
+		'display_fields' => 'photo,name,title,office,email',
 	);
 
 	/**
@@ -98,7 +99,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$inner_content = '';
 
 		foreach ( $people as $person ) {
-			$inner_content .= $this->generate_item_html( $person, $atts['output'] );
+			$inner_content .= $this->generate_item_html( $person, $atts['output'], $atts );
 		}
 
 		// Apply filters and add to content
@@ -208,10 +209,18 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 *
 	 * @param stdClass $person Data returned from the WP REST API.
 	 * @param string   $type   The type of output expected.
+	 * @param array    $atts   The shortcode attributes.
 	 *
 	 * @return string The generated HTML for an individual person.
 	 */
-	private function generate_item_html( $person, $type ) {
+	private function generate_item_html( $person, $type, $atts ) {
+		// Determine which fields to display.
+		if ( ! empty( $atts['display_fields'] ) ) {
+			$display_fields = array_map( 'trim', explode( ',', $atts['display_fields'] ) );
+		} else {
+			$display_fields = explode( ',', $this->local_extended_atts['display_fields'] );
+		}
+
 		// Cast the collection as an array to account for scenarios
 		// where it can sometimes come through as an object.
 		$photo_collection = (array) $person->photos;
@@ -251,19 +260,43 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			ob_start();
 			?>
 			<div class="wsuwp-person-container">
-				<?php if ( $photo ) : ?>
-				<figure class="wsuwp-person-photo">
-					<img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $person->title->rendered ); ?>" />
-				</figure>
-				<?php endif; ?>
-				<div class="wsuwp-person-name"><?php echo esc_html( $person->title->rendered ); ?></div>
-				<?php foreach ( $titles as $title ) { ?>
-				<div class="wsuwp-person-position"><?php echo esc_html( $title ); ?></div>
+
+				<?php if ( $photo && in_array( 'photo', $display_fields, true ) ) { ?>
+					<figure class="wsuwp-person-photo">
+						<img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $person->title->rendered ); ?>" />
+					</figure>
 				<?php } ?>
+
+				<?php if ( in_array( 'name', $display_fields, true ) ) { ?>
+				<div class="wsuwp-person-name"><?php echo esc_html( $person->title->rendered ); ?></div>
+				<?php } ?>
+
+				<?php if ( in_array( 'title', $display_fields, true ) ) { ?>
+					<?php foreach ( $titles as $title ) { ?>
+					<div class="wsuwp-person-position"><?php echo esc_html( $title ); ?></div>
+					<?php } ?>
+				<?php } ?>
+
+				<?php if ( in_array( 'office', $display_fields, true ) ) { ?>
 				<div class="wsuwp-person-office"><?php echo esc_html( $person->office ); ?></div>
+				<?php } ?>
+
+				<?php if ( in_array( 'email', $display_fields, true ) ) { ?>
 				<div class="wsuwp-person-email">
 					<a href="mailto:<?php echo esc_attr( $person->email ); ?>"><?php echo esc_html( $person->email ); ?></a>
 				</div>
+				<?php } ?>
+
+				<?php if ( in_array( 'phone', $display_fields, true ) ) { ?>
+				<div class="wsuwp-person-phone"><?php echo esc_html( $person->phone ); ?></div>
+				<?php } ?>
+
+				<?php if ( in_array( 'website', $display_fields, true ) ) { ?>
+				<div class="wsuwp-person-website">
+					<a href="echo esc_url( $person->website );"><?php echo esc_url( $person->website ); ?></a>
+				</div>
+				<?php } ?>
+
 			</div>
 			<?php
 			$html = ob_get_contents();
