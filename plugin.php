@@ -22,7 +22,7 @@ add_action( 'wsuwp_content_syndicate_shortcodes', 'WSU\ContentSyndicate\People\a
  * @since 1.0.0
  */
 function activate_shortcodes() {
-	include_once( dirname( __FILE__ ) . '/includes/class-wsu-syndicate-shortcode-people.php' );
+	include_once dirname( __FILE__ ) . '/includes/class-wsu-syndicate-shortcode-people.php';
 
 	// Add the [wsuwp_people] shortcode to pull calendar events.
 	new \WSU_Syndicate_Shortcode_People();
