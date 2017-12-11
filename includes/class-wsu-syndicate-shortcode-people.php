@@ -291,9 +291,9 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				<div class="wsuwp-person-phone"><?php echo esc_html( $person->phone ); ?></div>
 				<?php } ?>
 
-				<?php if ( in_array( 'website', $display_fields, true ) ) { ?>
+				<?php if ( in_array( 'website', $display_fields, true ) && ! empty( $person->website ) ) { ?>
 				<div class="wsuwp-person-website">
-					<a href="echo esc_url( $person->website );"><?php echo esc_url( $person->website ); ?></a>
+					<a href="<?php echo esc_url( $person->website ); ?>"><?php echo esc_url( $person->website ); ?></a>
 				</div>
 				<?php } ?>
 
