@@ -293,7 +293,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 				<?php if ( in_array( 'website', $display_fields, true ) ) { ?>
 				<div class="wsuwp-person-website">
-					<a href="echo esc_url( $person->website );"><?php echo esc_url( $person->website ); ?></a>
+					<a href="<?php echo esc_url( $person->website ); ?>"><?php echo esc_url( $person->website ); ?></a>
 				</div>
 				<?php } ?>
 
