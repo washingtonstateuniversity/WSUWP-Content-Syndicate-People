@@ -257,6 +257,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		}
 
 		$office = ( ! empty( $person->office_alt ) ) ? $person->office_alt : $person->office;
+		$address = ( ! empty( $person->address_alt ) ) ? $person->address_alt : $person->address;
 		$email = ( ! empty( $person->email_alt ) ) ? $person->email_alt : $person->email;
 		$phone = ( ! empty( $person->phone_alt ) ) ? $person->phone_alt : $person->phone;
 
@@ -283,6 +284,10 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 				<?php if ( in_array( 'office', $display_fields, true ) ) { ?>
 				<div class="wsuwp-person-office"><?php echo esc_html( $office ); ?></div>
+				<?php } ?>
+
+				<?php if ( in_array( 'address', $display_fields, true ) ) { ?>
+				<div class="wsuwp-person-address"><?php echo esc_html( $address ); ?></div>
 				<?php } ?>
 
 				<?php if ( in_array( 'email', $display_fields, true ) ) { ?>
