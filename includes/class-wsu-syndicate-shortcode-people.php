@@ -256,6 +256,10 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			$titles = array( $person->position_title );
 		}
 
+		$office = ( ! empty( $person->office_alt ) ) ? $person->office_alt : $person->office;
+		$email = ( ! empty( $person->email_alt ) ) ? $person->email_alt : $person->email;
+		$phone = ( ! empty( $person->phone_alt ) ) ? $person->phone_alt : $person->phone;
+
 		if ( 'basic' === $type ) {
 			ob_start();
 			?>
@@ -278,17 +282,17 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				<?php } ?>
 
 				<?php if ( in_array( 'office', $display_fields, true ) ) { ?>
-				<div class="wsuwp-person-office"><?php echo esc_html( $person->office ); ?></div>
+				<div class="wsuwp-person-office"><?php echo esc_html( $office ); ?></div>
 				<?php } ?>
 
 				<?php if ( in_array( 'email', $display_fields, true ) ) { ?>
 				<div class="wsuwp-person-email">
-					<a href="mailto:<?php echo esc_attr( $person->email ); ?>"><?php echo esc_html( $person->email ); ?></a>
+					<a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a>
 				</div>
 				<?php } ?>
 
 				<?php if ( in_array( 'phone', $display_fields, true ) ) { ?>
-				<div class="wsuwp-person-phone"><?php echo esc_html( $person->phone ); ?></div>
+				<div class="wsuwp-person-phone"><?php echo esc_html( $phone ); ?></div>
 				<?php } ?>
 
 				<?php if ( in_array( 'website', $display_fields, true ) && ! empty( $person->website ) ) { ?>
