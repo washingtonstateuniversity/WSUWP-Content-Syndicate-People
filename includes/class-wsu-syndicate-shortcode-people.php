@@ -17,6 +17,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	public $local_extended_atts = array(
 		'classification' => '',
 		'display_fields' => 'photo,name,title,office,email',
+		'photo_size' => 'thumbnail',
 	);
 
 	/**
@@ -226,12 +227,18 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$photo_collection = (array) $person->photos;
 		$photo = false;
 
+		// Determine the photo size to display.
+		// A note about the photo collection:
+		// if the uploaded image wasn't big enough to have generated a large or medium size,
+		// the full size image is assigned as the value for those keys.
+		$photo_size = ( in_array( $atts['photo_size'], array( 'medium', 'large' ), true ) ) ? $atts['photo_size'] : 'thumbnail';
+
 		// Get the URL of the display photo.
-		if ( ! empty( $photo_collection ) ) {
+		if ( in_array( 'photo', $display_fields, true ) && ! empty( $photo_collection ) ) {
 			if ( ! empty( $person->display_photo ) && isset( $photo_collection[ $person->display_photo ] ) ) {
-				$photo = $photo_collection[ $person->display_photo ]->thumbnail;
+				$photo = $photo_collection[ $person->display_photo ]->$photo_size;
 			} elseif ( isset( $photo_collection[0] ) ) {
-				$photo = $photo_collection[0]->thumbnail;
+				$photo = $photo_collection[0]->$photo_size;
 			}
 		}
 
