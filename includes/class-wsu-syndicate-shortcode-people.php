@@ -425,6 +425,63 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				</div>
 				<?php
 				}
+
+				if ( 'classification' === $filter && ! empty( $this->filter_terms['classification'] ) ) {
+				?>
+				<div class="wsuwp-people-filter classification">
+					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by classification</button>
+					<ul class="wsuwp-people-filter-terms">
+						<?php foreach ( $this->filter_terms['classification'] as $slug => $name ) { ?>
+						<li>
+							<label>
+								<input type="checkbox" value="classification-<?php echo esc_attr( $slug ); ?>">
+								<span><?php echo esc_html( $name ); ?></span>
+							</label>
+						</li>
+						<?php } ?>
+					</ul>
+				</div>
+				<?php
+				}
+
+				if ( 'tag' === $filter && ! empty( $this->filter_terms['post_tag'] ) ) {
+				?>
+				<div class="wsuwp-people-filter tag">
+					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by tag</button>
+					<ul class="wsuwp-people-filter-terms">
+						<?php foreach ( $this->filter_terms['post_tag'] as $slug => $name ) { ?>
+						<li>
+							<label>
+								<input type="checkbox" value="tag-<?php echo esc_attr( $slug ); ?>">
+								<span><?php echo esc_html( $name ); ?></span>
+							</label>
+						</li>
+						<?php } ?>
+					</ul>
+				</div>
+				<?php
+				}
+
+				$categories = array_merge( $this->filter_terms['wsuwp_university_category'], $this->filter_terms['category'] );
+				$categories = array_unique( $categories );
+
+				if ( 'category' === $filter && ! empty( $categories ) ) {
+				?>
+				<div class="wsuwp-people-filter category">
+					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by category</button>
+					<ul class="wsuwp-people-filter-terms">
+						<?php foreach ( $categories as $slug => $name ) { ?>
+						<li>
+							<label>
+								<input type="checkbox" value="category-<?php echo esc_attr( $slug ); ?>">
+								<span><?php echo esc_html( $name ); ?></span>
+							</label>
+						</li>
+						<?php } ?>
+					</ul>
+				</div>
+				<?php
+				}
 			}
 			?>
 			</div>
