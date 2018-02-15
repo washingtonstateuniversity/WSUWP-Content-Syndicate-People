@@ -391,96 +391,28 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				}
 
 				if ( 'location' === $filter && ! empty( $this->filter_terms['wsuwp_university_location'] ) ) {
-				?>
-				<div class="wsuwp-people-filter location">
-					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by location</button>
-					<ul class="wsuwp-people-filter-terms">
-						<?php foreach ( $this->filter_terms['wsuwp_university_location'] as $slug => $name ) { ?>
-						<li>
-							<label>
-								<input type="checkbox" value="location-<?php echo esc_attr( $slug ); ?>">
-								<span><?php echo esc_html( $name ); ?></span>
-							</label>
-						</li>
-						<?php } ?>
-					</ul>
-				</div>
-				<?php
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_location'] );
 				}
 
 				if ( 'organization' === $filter && ! empty( $this->filter_terms['wsuwp_university_org'] ) ) {
-				?>
-				<div class="wsuwp-people-filter organization">
-					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by organization</button>
-					<ul class="wsuwp-people-filter-terms">
-						<?php foreach ( $this->filter_terms['wsuwp_university_org'] as $slug => $name ) { ?>
-						<li>
-							<label>
-								<input type="checkbox" value="org-<?php echo esc_attr( $slug ); ?>">
-								<span><?php echo esc_html( $name ); ?></span>
-							</label>
-						</li>
-						<?php } ?>
-					</ul>
-				</div>
-				<?php
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_org'] );
 				}
 
 				if ( 'classification' === $filter && ! empty( $this->filter_terms['classification'] ) ) {
-				?>
-				<div class="wsuwp-people-filter classification">
-					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by classification</button>
-					<ul class="wsuwp-people-filter-terms">
-						<?php foreach ( $this->filter_terms['classification'] as $slug => $name ) { ?>
-						<li>
-							<label>
-								<input type="checkbox" value="classification-<?php echo esc_attr( $slug ); ?>">
-								<span><?php echo esc_html( $name ); ?></span>
-							</label>
-						</li>
-						<?php } ?>
-					</ul>
-				</div>
-				<?php
+					$this->term_options_html( $filter, $this->filter_terms['classification'] );
 				}
 
 				if ( 'tag' === $filter && ! empty( $this->filter_terms['post_tag'] ) ) {
-				?>
-				<div class="wsuwp-people-filter tag">
-					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by tag</button>
-					<ul class="wsuwp-people-filter-terms">
-						<?php foreach ( $this->filter_terms['post_tag'] as $slug => $name ) { ?>
-						<li>
-							<label>
-								<input type="checkbox" value="tag-<?php echo esc_attr( $slug ); ?>">
-								<span><?php echo esc_html( $name ); ?></span>
-							</label>
-						</li>
-						<?php } ?>
-					</ul>
-				</div>
-				<?php
+					$this->term_options_html( $filter, $this->filter_terms['post_tag'] );
 				}
 
-				$categories = array_merge( $this->filter_terms['wsuwp_university_category'], $this->filter_terms['category'] );
-				$categories = array_unique( $categories );
+				if ( 'category' === $filter ) {
+					$categories = array_merge( $this->filter_terms['wsuwp_university_category'], $this->filter_terms['category'] );
+					$categories = array_unique( $categories );
 
-				if ( 'category' === $filter && ! empty( $categories ) ) {
-				?>
-				<div class="wsuwp-people-filter category">
-					<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by category</button>
-					<ul class="wsuwp-people-filter-terms">
-						<?php foreach ( $categories as $slug => $name ) { ?>
-						<li>
-							<label>
-								<input type="checkbox" value="category-<?php echo esc_attr( $slug ); ?>">
-								<span><?php echo esc_html( $name ); ?></span>
-							</label>
-						</li>
-						<?php } ?>
-					</ul>
-				</div>
-				<?php
+					if ( ! empty( $categories ) ) {
+						$this->term_options_html( $filter, $categories );
+					}
 				}
 			}
 			?>
@@ -490,5 +422,31 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 			return $html;
 		}
+	}
+
+	/**
+	 * Generate the HTML used for taxonomy term options.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $option     The current filter being displayed.
+	 * @param string $taxonomy   The taxonomy to output terms for.
+	 */
+	private function term_options_html( $option, $taxonomy ) {
+		?>
+		<div class="wsuwp-people-filter <?php echo esc_attr( $option ); ?>">
+			<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by <?php echo esc_html( $option ); ?></button>
+			<ul class="wsuwp-people-filter-terms">
+				<?php foreach ( $taxonomy as $slug => $name ) { ?>
+				<li>
+					<label>
+						<input type="checkbox" value="<?php echo esc_attr( $option ) . '-' . esc_attr( $slug ); ?>">
+						<span><?php echo esc_html( $name ); ?></span>
+					</label>
+				</li>
+				<?php } ?>
+			</ul>
+		</div>
+		<?php
 	}
 }
