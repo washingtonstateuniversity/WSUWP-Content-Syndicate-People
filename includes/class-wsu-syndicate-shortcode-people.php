@@ -29,6 +29,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'classification_filter_label' => 'Filter by classification',
 		'tag_filter_label' => 'Filter by tag',
 		'category_filter_label' => 'Filter by category',
+		'website_link_text' => 'Website',
 	);
 
 	/**
@@ -336,7 +337,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 				<?php if ( in_array( 'website', $display_fields, true ) && ! empty( $person->website ) ) { ?>
 				<div class="wsuwp-person-website">
-					<a href="<?php echo esc_url( $person->website ); ?>"><?php echo esc_url( $person->website ); ?></a>
+					<a href="<?php echo esc_url( $person->website ); ?>"><?php echo esc_html( $atts['website_link_text'] ); ?></a>
 				</div>
 				<?php } ?>
 
