@@ -22,6 +22,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	public $local_extended_atts = array(
 		'classification' => '',
 		'display_fields' => 'photo,name,title,office,email',
+		'photo_size' => 'thumbnail',
 		'filters' => '',
 		'search_filter_label' => 'Type to search',
 		'location_filter_label' => 'Filter by location',
@@ -270,12 +271,18 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$photo_collection = (array) $person->photos;
 		$photo = false;
 
+		// Determine the photo size to display.
+		// A note about the photo collection:
+		// if the uploaded image wasn't big enough to have generated a large or medium size,
+		// the full size image is assigned as the value for those keys.
+		$photo_size = ( in_array( $atts['photo_size'], array( 'medium', 'large' ), true ) ) ? $atts['photo_size'] : 'thumbnail';
+
 		// Get the URL of the display photo.
-		if ( ! empty( $photo_collection ) ) {
+		if ( in_array( 'photo', $display_fields, true ) && ! empty( $photo_collection ) ) {
 			if ( ! empty( $person->display_photo ) && isset( $photo_collection[ $person->display_photo ] ) ) {
-				$photo = $photo_collection[ $person->display_photo ]->thumbnail;
+				$photo = $photo_collection[ $person->display_photo ]->$photo_size;
 			} elseif ( isset( $photo_collection[0] ) ) {
-				$photo = $photo_collection[0]->thumbnail;
+				$photo = $photo_collection[0]->$photo_size;
 			}
 		}
 
@@ -300,6 +307,11 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			$titles = array( $person->position_title );
 		}
 
+		$office = ( ! empty( $person->office_alt ) ) ? $person->office_alt : $person->office;
+		$address = ( ! empty( $person->address_alt ) ) ? $person->address_alt : $person->address;
+		$email = ( ! empty( $person->email_alt ) ) ? $person->email_alt : $person->email;
+		$phone = ( ! empty( $person->phone_alt ) ) ? $person->phone_alt : $person->phone;
+
 		if ( 'basic' === $type ) {
 			ob_start();
 			?>
@@ -322,17 +334,21 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				<?php } ?>
 
 				<?php if ( in_array( 'office', $display_fields, true ) ) { ?>
-				<div class="wsuwp-person-office"><?php echo esc_html( $person->office ); ?></div>
+				<div class="wsuwp-person-office"><?php echo esc_html( $office ); ?></div>
+				<?php } ?>
+
+				<?php if ( in_array( 'address', $display_fields, true ) ) { ?>
+				<div class="wsuwp-person-address"><?php echo esc_html( $address ); ?></div>
 				<?php } ?>
 
 				<?php if ( in_array( 'email', $display_fields, true ) ) { ?>
 				<div class="wsuwp-person-email">
-					<a href="mailto:<?php echo esc_attr( $person->email ); ?>"><?php echo esc_html( $person->email ); ?></a>
+					<a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a>
 				</div>
 				<?php } ?>
 
 				<?php if ( in_array( 'phone', $display_fields, true ) ) { ?>
-				<div class="wsuwp-person-phone"><?php echo esc_html( $person->phone ); ?></div>
+				<div class="wsuwp-person-phone"><?php echo esc_html( $phone ); ?></div>
 				<?php } ?>
 
 				<?php if ( in_array( 'website', $display_fields, true ) && ! empty( $person->website ) ) { ?>
