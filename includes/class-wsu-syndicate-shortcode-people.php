@@ -23,6 +23,12 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'classification' => '',
 		'display_fields' => 'photo,name,title,office,email',
 		'filters' => '',
+		'search_filter_label' => 'Type to search',
+		'location_filter_label' => 'Filter by location',
+		'organization_filter_label' => 'Filter by organization',
+		'classification_filter_label' => 'Filter by classification',
+		'tag_filter_label' => 'Filter by tag',
+		'category_filter_label' => 'Filter by category',
 	);
 
 	/**
@@ -121,7 +127,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		foreach ( $people as $person ) {
 			if ( ! empty( $atts['filters'] ) ) {
 				$last_iteration = ( end( $people ) === $person );
-				$content .= $this->generate_filter_html( $person, $atts['filters'], $last_iteration );
+				$content .= $this->generate_filter_html( $person, $atts, $last_iteration );
 			}
 
 			$inner_content .= $this->generate_item_html( $person, $atts['output'], $atts );
@@ -351,13 +357,13 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @since 1.2.0
 	 *
 	 * @param stdClass $person         Data returned from the WP REST API.
-	 * @param string   $filters        The shortcode attributes.
+	 * @param string   $atts           The shortcode attributes.
 	 * @param boolean  $last_iteration If this is the last iteration of WP REST API data.
 	 *
 	 * @return string The generated HTML for filter inputs.
 	 */
-	private function generate_filter_html( $person, $filters, $last_iteration ) {
-		$filters = array_map( 'trim', explode( ',', $filters ) );
+	private function generate_filter_html( $person, $atts, $last_iteration ) {
+		$filters = array_map( 'trim', explode( ',', $atts['filters'] ) );
 
 		if ( ! empty( array_intersect( array( 'location', 'organization' ), $filters ) ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
@@ -384,26 +390,26 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				<div class="wsuwp-people-filter search">
 					<label>
 						<span class="screen-reader-text">Start typing to search</span>
-						<input type="search" value="" placeholder="Type to search" autocomplete="off" />
+						<input type="search" value="" placeholder="<?php echo esc_attr( $atts['search_filter_label'] ); ?>" autocomplete="off" />
 					</span>
 				</div>
 				<?php
 				}
 
 				if ( 'location' === $filter && ! empty( $this->filter_terms['wsuwp_university_location'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_location'] );
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_location'], $atts['location_filter_label'] );
 				}
 
 				if ( 'organization' === $filter && ! empty( $this->filter_terms['wsuwp_university_org'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_org'] );
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_org'], $atts['organization_filter_label'] );
 				}
 
 				if ( 'classification' === $filter && ! empty( $this->filter_terms['classification'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['classification'] );
+					$this->term_options_html( $filter, $this->filter_terms['classification'], $atts['classification_filter_label'] );
 				}
 
 				if ( 'tag' === $filter && ! empty( $this->filter_terms['post_tag'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['post_tag'] );
+					$this->term_options_html( $filter, $this->filter_terms['post_tag'], $atts['tag_filter_label'] );
 				}
 
 				if ( 'category' === $filter ) {
@@ -411,7 +417,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 					$categories = array_unique( $categories );
 
 					if ( ! empty( $categories ) ) {
-						$this->term_options_html( $filter, $categories );
+						$this->term_options_html( $filter, $categories, $atts['category_filter_label'] );
 					}
 				}
 			}
@@ -429,13 +435,14 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param string $option     The current filter being displayed.
-	 * @param string $taxonomy   The taxonomy to output terms for.
+	 * @param string $option   The current filter being displayed.
+	 * @param string $taxonomy The taxonomy to output terms for.
+	 * @param string $label    Label text.
 	 */
-	private function term_options_html( $option, $taxonomy ) {
+	private function term_options_html( $option, $taxonomy, $label ) {
 		?>
 		<div class="wsuwp-people-filter <?php echo esc_attr( $option ); ?>">
-			<button type="button" class="wsuwp-people-filter-label" aria-expanded="false">Filter by <?php echo esc_html( $option ); ?></button>
+			<button type="button" class="wsuwp-people-filter-label" aria-expanded="false"><?php echo esc_html( $label ); ?></button>
 			<ul class="wsuwp-people-filter-terms">
 				<?php foreach ( $taxonomy as $slug => $name ) { ?>
 				<li>
