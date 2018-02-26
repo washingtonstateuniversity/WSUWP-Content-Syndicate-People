@@ -257,6 +257,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		// Build out the profile container classes.
 		$classes = 'wsuwp-person-container';
+		$classes .= ' ' . $person->slug;
 
 		if ( ! empty( $atts['filters'] ) && ! empty( $person->taxonomy_terms ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
