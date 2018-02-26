@@ -2,6 +2,11 @@
 
 class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	/**
+	 * @var string Script version for cache breaking.
+	 */
+	public $script_version = '1.2.0';
+
+	/**
 	 * @var array A list of defaults specific to people that will override the
 	 *            base defaults set for all syndicate shortcodes.
 	 */
@@ -18,12 +23,25 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'classification' => '',
 		'display_fields' => 'photo,name,title,office,email',
 		'photo_size' => 'thumbnail',
+		'filters' => '',
+		'search_filter_label' => 'Type to search',
+		'location_filter_label' => 'Filter by location',
+		'organization_filter_label' => 'Filter by organization',
+		'classification_filter_label' => 'Filter by classification',
+		'tag_filter_label' => 'Filter by tag',
+		'category_filter_label' => 'Filter by category',
+		'website_link_text' => 'Website',
 	);
 
 	/**
 	 * @var string Shortcode name.
 	 */
 	public $shortcode_name = 'wsuwp_people';
+
+	/**
+	 * @var array
+	 */
+	public $filter_terms = array();
 
 	public function __construct() {
 		parent::construct();
@@ -99,7 +117,21 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		// html of profiles that's filtered before adding to content.
 		$inner_content = '';
 
+		$this->filter_terms = array(
+			'wsuwp_university_location' => array(),
+			'wsuwp_university_org' => array(),
+			'wsuwp_university_category' => array(),
+			'classification' => array(),
+			'post_tag' => array(),
+			'category' => array(),
+		);
+
 		foreach ( $people as $person ) {
+			if ( ! empty( $atts['filters'] ) ) {
+				$last_iteration = ( end( $people ) === $person );
+				$content .= $this->generate_filter_html( $person, $atts, $last_iteration );
+			}
+
 			$inner_content .= $this->generate_item_html( $person, $atts['output'], $atts );
 		}
 
@@ -222,6 +254,18 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			$display_fields = explode( ',', $this->local_extended_atts['display_fields'] );
 		}
 
+		// Build out the profile container classes.
+		$classes = 'wsuwp-person-container';
+
+		if ( ! empty( $atts['filters'] ) && ! empty( $person->taxonomy_terms ) ) {
+			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
+				$prefix = array_pop( explode( '_', $taxonomy ) );
+				foreach ( $terms as $term ) {
+					$classes .= ' ' . $prefix . '-' . $term->slug;
+				}
+			}
+		}
+
 		// Cast the collection as an array to account for scenarios
 		// where it can sometimes come through as an object.
 		$photo_collection = (array) $person->photos;
@@ -271,7 +315,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		if ( 'basic' === $type ) {
 			ob_start();
 			?>
-			<div class="wsuwp-person-container">
+			<div class="<?php echo esc_attr( $classes ); ?>">
 
 				<?php if ( $photo && in_array( 'photo', $display_fields, true ) ) { ?>
 					<figure class="wsuwp-person-photo">
@@ -309,7 +353,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 				<?php if ( in_array( 'website', $display_fields, true ) && ! empty( $person->website ) ) { ?>
 				<div class="wsuwp-person-website">
-					<a href="<?php echo esc_url( $person->website ); ?>"><?php echo esc_url( $person->website ); ?></a>
+					<a href="<?php echo esc_url( $person->website ); ?>"><?php echo esc_html( $atts['website_link_text'] ); ?></a>
 				</div>
 				<?php } ?>
 
@@ -322,5 +366,111 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		}
 
 		return apply_filters( 'wsuwp_people_item_html', '', $person, $type );
+	}
+
+	/**
+	 * Generate the HTML used for filter inputs.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param stdClass $person         Data returned from the WP REST API.
+	 * @param string   $atts           The shortcode attributes.
+	 * @param boolean  $last_iteration If this is the last iteration of WP REST API data.
+	 *
+	 * @return string The generated HTML for filter inputs.
+	 */
+	private function generate_filter_html( $person, $atts, $last_iteration ) {
+		$filters = array_map( 'trim', explode( ',', $atts['filters'] ) );
+
+		if ( ! empty( array_intersect( array( 'location', 'organization' ), $filters ) ) ) {
+			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
+				foreach ( $terms as $term ) {
+					if ( ! in_array( $term->slug, $this->filter_terms[ $taxonomy ], true ) ) {
+						$this->filter_terms[ $taxonomy ][ $term->slug ] = $term->name;
+					}
+				}
+			}
+		}
+
+		if ( $last_iteration ) {
+			wp_enqueue_style( 'wsuwp-people-filter', plugins_url( 'css/filters.css', dirname( __FILE__ ) ), array(), $this->script_version );
+			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
+
+			ob_start();
+			?>
+			<div class="wsuwp-people-filters">
+			<?php
+			foreach ( $filters as $filter ) {
+
+				if ( 'search' === $filter ) {
+				?>
+				<div class="wsuwp-people-filter search">
+					<label>
+						<span class="screen-reader-text">Start typing to search</span>
+						<input type="search" value="" placeholder="<?php echo esc_attr( $atts['search_filter_label'] ); ?>" autocomplete="off" />
+					</span>
+				</div>
+				<?php
+				}
+
+				if ( 'location' === $filter && ! empty( $this->filter_terms['wsuwp_university_location'] ) ) {
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_location'], $atts['location_filter_label'] );
+				}
+
+				if ( 'organization' === $filter && ! empty( $this->filter_terms['wsuwp_university_org'] ) ) {
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_org'], $atts['organization_filter_label'] );
+				}
+
+				if ( 'classification' === $filter && ! empty( $this->filter_terms['classification'] ) ) {
+					$this->term_options_html( $filter, $this->filter_terms['classification'], $atts['classification_filter_label'] );
+				}
+
+				if ( 'tag' === $filter && ! empty( $this->filter_terms['post_tag'] ) ) {
+					$this->term_options_html( $filter, $this->filter_terms['post_tag'], $atts['tag_filter_label'] );
+				}
+
+				if ( 'category' === $filter ) {
+					$categories = array_merge( $this->filter_terms['wsuwp_university_category'], $this->filter_terms['category'] );
+					$categories = array_unique( $categories );
+
+					if ( ! empty( $categories ) ) {
+						$this->term_options_html( $filter, $categories, $atts['category_filter_label'] );
+					}
+				}
+			}
+			?>
+			</div>
+			<?php
+			$html = ob_get_clean();
+
+			return $html;
+		}
+	}
+
+	/**
+	 * Generate the HTML used for taxonomy term options.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $option   The current filter being displayed.
+	 * @param string $taxonomy The taxonomy to output terms for.
+	 * @param string $label    Label text.
+	 */
+	private function term_options_html( $option, $taxonomy, $label ) {
+		?>
+		<div class="wsuwp-people-filter <?php echo esc_attr( $option ); ?>">
+			<button type="button" class="wsuwp-people-filter-label" aria-expanded="false"><?php echo esc_html( $label ); ?></button>
+			<ul class="wsuwp-people-filter-terms">
+				<?php foreach ( $taxonomy as $slug => $name ) { ?>
+				<li>
+					<label>
+						<input type="checkbox" value="<?php echo esc_attr( $option ) . '-' . esc_attr( $slug ); ?>">
+						<span><?php echo esc_html( $name ); ?></span>
+					</label>
+				</li>
+				<?php } ?>
+			</ul>
+		</div>
+		<?php
 	}
 }

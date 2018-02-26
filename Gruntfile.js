@@ -35,14 +35,69 @@ module.exports = function( grunt ) {
                     unused: false,
                     node: true     // Define globals available when running in Node.
                 }
+            },
+            plugin_script: {
+                src: [ "src/js/*.js" ],
+                options: {
+                    bitwise: true,
+                    curly: true,
+                    eqeqeq: true,
+                    forin: true,
+                    freeze: true,
+                    noarg: true,
+                    nonbsp: true,
+                    quotmark: "double",
+                    undef: true,
+                    unused: true,
+                    browser: true, // Define globals exposed by modern browsers.
+                    jquery: true   // Define globals exposed by jQuery.
+                }
+            }
+        },
+
+        uglify: {
+            all: {
+                files: [ {
+                    expand: true,
+                    cwd: "src/js/",
+                    src: "*.js",
+                    dest: "js",
+                    ext: ".min.js"
+                } ]
+            }
+        },
+
+        stylelint: {
+            src: [ "src/css/*.css" ]
+        },
+
+        postcss: {
+            options: {
+                processors: [
+                    require( "autoprefixer" )( {
+                        browsers: [ "> 1%", "ie 8-11", "Firefox ESR" ]
+                    } )
+                ]
+            },
+            all: {
+                files: [ {
+                    expand: true,
+                    cwd: "src/css/",
+                    src: "*.css",
+                    dest: "css",
+                    ext: ".css"
+                } ]
             }
         }
     } );
 
-	grunt.loadNpmTasks( "grunt-jscs" );
 	grunt.loadNpmTasks( "grunt-contrib-jshint" );
+	grunt.loadNpmTasks( "grunt-contrib-uglify" );
+	grunt.loadNpmTasks( "grunt-jscs" );
+	grunt.loadNpmTasks( "grunt-postcss" );
 	grunt.loadNpmTasks( "grunt-phpcs" );
+	grunt.loadNpmTasks( "grunt-stylelint" );
 
     // Default task(s).
-    grunt.registerTask( "default", [ "phpcs", "jscs", "jshint" ] );
+    grunt.registerTask( "default", [ "phpcs", "jscs", "jshint", "uglify", "stylelint", "postcss" ] );
 };
