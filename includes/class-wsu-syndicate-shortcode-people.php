@@ -31,6 +31,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'tag_filter_label' => 'Filter by tag',
 		'category_filter_label' => 'Filter by category',
 		'website_link_text' => 'Website',
+		'link' => '',
 	);
 
 	/**
@@ -256,6 +257,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		// Build out the profile container classes.
 		$classes = 'wsuwp-person-container';
+		$classes .= ' ' . $person->slug;
 
 		if ( ! empty( $atts['filters'] ) && ! empty( $person->taxonomy_terms ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
@@ -312,19 +314,49 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$email = ( ! empty( $person->email_alt ) ) ? $person->email_alt : $person->email;
 		$phone = ( ! empty( $person->phone_alt ) ) ? $person->phone_alt : $person->phone;
 
+		// Set up profile URL.
+		$link = false;
+
+		if ( ! empty( $atts['link'] ) && 'people.wsu.edu' !== $atts['host'] ) {
+			if ( 'has-bio' === $atts['link'] ) {
+
+				switch ( $person->display_bio ) {
+					case 'university':
+						$bio = $person->bio_university;
+						break;
+					case 'unit':
+						$bio = $person->bio_unit;
+						break;
+					default:
+						$bio = $person->content->rendered;
+				}
+				if ( ! empty( $bio ) ) {
+					$link = $person->link;
+				}
+			} elseif ( 'yes' === $atts['link'] ) {
+				$link = $person->link;
+			}
+		}
+
 		if ( 'basic' === $type ) {
 			ob_start();
 			?>
 			<div class="<?php echo esc_attr( $classes ); ?>">
 
 				<?php if ( $photo && in_array( 'photo', $display_fields, true ) ) { ?>
-					<figure class="wsuwp-person-photo">
+					<figure class="wsuwp-person-photo" aria-hidden="true">
+						<?php if ( $link ) { ?><a href="<?php echo esc_url( $link ); ?>"><?php } ?>
 						<img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $person->title->rendered ); ?>" />
+						<?php if ( $link ) { ?></a><?php } ?>
 					</figure>
 				<?php } ?>
 
 				<?php if ( in_array( 'name', $display_fields, true ) ) { ?>
-				<div class="wsuwp-person-name"><?php echo esc_html( $person->title->rendered ); ?></div>
+				<div class="wsuwp-person-name">
+					<?php if ( $link ) { ?><a href="<?php echo esc_url( $link ); ?>"><?php } ?>
+					<?php echo esc_html( $person->title->rendered ); ?>
+					<?php if ( $link ) { ?></a><?php } ?>
+					</div>
 				<?php } ?>
 
 				<?php if ( in_array( 'title', $display_fields, true ) ) { ?>
