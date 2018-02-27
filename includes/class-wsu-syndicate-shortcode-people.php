@@ -4,7 +4,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	/**
 	 * @var string Script version for cache breaking.
 	 */
-	public $script_version = '1.2.0';
+	public $script_version = '1.2.1';
 
 	/**
 	 * @var array A list of defaults specific to people that will override the
@@ -69,6 +69,11 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		if ( ! $site_url ) {
 			return '<!-- wsuwp_people ERROR - an empty host was supplied -->';
+		}
+
+		if ( ! empty( $atts['filters'] ) ) {
+			wp_enqueue_style( 'wsuwp-people-filter', plugins_url( 'css/filters.css', dirname( __FILE__ ) ), array(), $this->script_version );
+			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
 		}
 
 		$content = $this->get_content_cache( $atts, 'wsuwp_people' );
@@ -425,8 +430,6 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		}
 
 		if ( $last_iteration ) {
-			wp_enqueue_style( 'wsuwp-people-filter', plugins_url( 'css/filters.css', dirname( __FILE__ ) ), array(), $this->script_version );
-			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
 
 			ob_start();
 			?>
