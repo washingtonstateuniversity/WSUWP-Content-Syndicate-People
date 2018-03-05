@@ -4,7 +4,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	/**
 	 * @var string Script version for cache breaking.
 	 */
-	public $script_version = '1.2.1';
+	public $script_version = '1.2.2';
 
 	/**
 	 * @var array A list of defaults specific to people that will override the
@@ -419,7 +419,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	private function generate_filter_html( $person, $atts, $last_iteration ) {
 		$filters = array_map( 'trim', explode( ',', $atts['filters'] ) );
 
-		if ( ! empty( array_intersect( array( 'location', 'organization' ), $filters ) ) ) {
+		if ( ! empty( array_intersect( array( 'location', 'organization', 'category', 'tag', 'classification' ), $filters ) ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
 				foreach ( $terms as $term ) {
 					if ( ! in_array( $term->slug, $this->filter_terms[ $taxonomy ], true ) ) {
