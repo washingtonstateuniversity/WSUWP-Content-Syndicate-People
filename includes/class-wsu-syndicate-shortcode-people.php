@@ -492,6 +492,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @param string $label    Label text.
 	 */
 	private function term_options_html( $option, $taxonomy, $label ) {
+		sort( $taxonomy );
 		?>
 		<div class="wsuwp-people-filter <?php echo esc_attr( $option ); ?>">
 			<button type="button" class="wsuwp-people-filter-label" aria-expanded="false"><?php echo esc_html( $label ); ?></button>
