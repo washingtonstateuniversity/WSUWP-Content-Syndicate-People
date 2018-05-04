@@ -266,7 +266,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		if ( ! empty( $atts['filters'] ) && ! empty( $person->taxonomy_terms ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
-				$prefix = array_pop( explode( '_', $taxonomy ) );
+				$prefix = ( 'wsuwp_university_org' === $taxonomy ) ? 'organization' : array_pop( explode( '_', $taxonomy ) );
 				foreach ( $terms as $term ) {
 					$classes .= ' ' . $prefix . '-' . $term->slug;
 				}
@@ -492,7 +492,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @param string $label    Label text.
 	 */
 	private function term_options_html( $option, $taxonomy, $label ) {
-		sort( $taxonomy );
+		ksort( $taxonomy );
 		?>
 		<div class="wsuwp-people-filter <?php echo esc_attr( $option ); ?>">
 			<button type="button" class="wsuwp-people-filter-label" aria-expanded="false"><?php echo esc_html( $label ); ?></button>
