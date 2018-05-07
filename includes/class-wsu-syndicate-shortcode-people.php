@@ -364,6 +364,12 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 					</div>
 				<?php } ?>
 
+				<?php if ( in_array( 'degree', $display_fields, true ) ) { ?>
+					<?php foreach ( $person->degree as $degree ) { ?>
+					<div class="wsuwp-person-degree"><?php echo esc_html( $degree ); ?></div>
+					<?php } ?>
+				<?php } ?>
+
 				<?php if ( in_array( 'title', $display_fields, true ) ) { ?>
 					<?php foreach ( $titles as $title ) { ?>
 					<div class="wsuwp-person-position"><?php echo esc_html( $title ); ?></div>
