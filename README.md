@@ -9,7 +9,7 @@ A WordPress plugin to retrieve and display people from people.wsu.edu.
 This plugin adds the following attributes to shortcodes registered with or extended from WSUWP Content Syndicate:
 
 * `classification` - Classification slug to retrieve people by.
-* `display_fields` - A comma-separated list of fields to display for each profile. Defaults to `photo,name,title,office,email`. Additional fields include `address`, `phone`, and `website`.
+* `display_fields` - A comma-separated list of fields to display for each profile. Defaults to `photo,name,title,office,email`. Additional fields include `degree`, `address`, `phone`, and `website`.
 * `filters` - A comma-separated list of filtering options. Allowed values include `search`, `location`, `organization`, `classification`, `tag`, and `category`. The `category` value combines terms from university categories and site categories. Labels for each filter option can be adjusted using the attributes below:
   * `category_filter_label` - Defaults to `Filter by category`.
   * `classification_filter_label` - Defaults to `Filter by classification`.
