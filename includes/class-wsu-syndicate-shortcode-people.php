@@ -86,7 +86,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$request_url = $this->build_taxonomy_filters( $atts, $request_url );
 
 		if ( $atts['count'] ) {
-			$count = ( 100 < absint( $atts['count'] ) ) ? 100 : $atts['count'];
+			$count = ( 200 < absint( $atts['count'] ) ) ? 200 : $atts['count'];
 			$request_url = add_query_arg( array(
 				'per_page' => absint( $count ),
 			), $request_url );
