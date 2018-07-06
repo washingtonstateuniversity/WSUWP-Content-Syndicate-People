@@ -32,6 +32,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'category_filter_label' => 'Filter by category',
 		'website_link_text' => 'Website',
 		'link' => '',
+		'nid' => '',
 	);
 
 	/**
