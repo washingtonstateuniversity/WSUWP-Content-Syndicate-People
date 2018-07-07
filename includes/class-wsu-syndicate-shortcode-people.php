@@ -84,19 +84,26 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		}
 
 		$request_url = esc_url( $site_url['host'] . $site_url['path'] . $this->default_path ) . $atts['query'];
-		$request_url = $this->build_taxonomy_filters( $atts, $request_url );
 
-		if ( $atts['count'] ) {
-			$count = ( 200 < absint( $atts['count'] ) ) ? 200 : $atts['count'];
+		if ( $atts['nid'] ) {
 			$request_url = add_query_arg( array(
-				'per_page' => absint( $count ),
+				'wsu_nid' => sanitize_text_field( $atts['nid'] ),
 			), $request_url );
-		}
+		} else {
+			$request_url = $this->build_taxonomy_filters( $atts, $request_url );
 
-		if ( ! empty( $atts['classification'] ) ) {
-			$request_url = add_query_arg( array(
-				'filter[classification]' => sanitize_key( $atts['classification'] ),
-			), $request_url );
+			if ( $atts['count'] ) {
+				$count = ( 200 < absint( $atts['count'] ) ) ? 200 : $atts['count'];
+				$request_url = add_query_arg( array(
+					'per_page' => absint( $count ),
+				), $request_url );
+			}
+
+			if ( ! empty( $atts['classification'] ) ) {
+				$request_url = add_query_arg( array(
+					'filter[classification]' => sanitize_key( $atts['classification'] ),
+				), $request_url );
+			}
 		}
 
 		$response = wp_remote_get( $request_url );
