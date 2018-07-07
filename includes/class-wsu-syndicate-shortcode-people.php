@@ -72,7 +72,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			return '<!-- wsuwp_people ERROR - an empty host was supplied -->';
 		}
 
-		if ( ! empty( $atts['filters'] ) ) {
+		if ( ! empty( $atts['filters'] ) && empty( $atts['nid'] ) ) {
 			wp_enqueue_style( 'wsuwp-people-filter', plugins_url( 'css/filters.css', dirname( __FILE__ ) ), array(), $this->script_version );
 			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
 		}
@@ -134,7 +134,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		);
 
 		foreach ( $people as $person ) {
-			if ( ! empty( $atts['filters'] ) ) {
+			if ( ! empty( $atts['filters'] ) && empty( $atts['nid'] ) ) {
 				$last_iteration = ( end( $people ) === $person );
 				$content .= $this->generate_filter_html( $person, $atts, $last_iteration );
 			}
@@ -265,7 +265,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$classes = 'wsuwp-person-container';
 		$classes .= ' ' . $person->slug;
 
-		if ( ! empty( $atts['filters'] ) && ! empty( $person->taxonomy_terms ) ) {
+		if ( ! empty( $atts['filters'] ) && empty( $atts['nid'] ) && ! empty( $person->taxonomy_terms ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
 				$prefix = ( 'wsuwp_university_org' === $taxonomy ) ? 'organization' : array_pop( explode( '_', $taxonomy ) );
 				foreach ( $terms as $term ) {
