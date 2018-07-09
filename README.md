@@ -20,3 +20,4 @@ This plugin adds the following attributes to shortcodes registered with or exten
 * `photo_size` - Specify the size of the photo to display for each profile. Defaults to `thumbnail`. Other allowed values include `medium` and `large`.
 * `link` - Link a person's name and photo to their full profile. Works only when the `host` attribute is being used.
 * `website_link_text` - Link text to display for the `website` field when it is being output. Defaults to `Website`.
+* `nid` - Displays an individual person associated with the given WSU Network ID.
