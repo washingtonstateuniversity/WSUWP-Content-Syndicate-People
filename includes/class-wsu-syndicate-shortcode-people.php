@@ -452,14 +452,14 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			foreach ( $filters as $filter ) {
 
 				if ( 'search' === $filter ) {
-				?>
-				<div class="wsuwp-people-filter search">
-					<label>
-						<span class="screen-reader-text">Start typing to search</span>
-						<input type="search" value="" placeholder="<?php echo esc_attr( $atts['search_filter_label'] ); ?>" autocomplete="off" />
-					</span>
-				</div>
-				<?php
+					?>
+					<div class="wsuwp-people-filter search">
+						<label>
+							<span class="screen-reader-text">Start typing to search</span>
+							<input type="search" value="" placeholder="<?php echo esc_attr( $atts['search_filter_label'] ); ?>" autocomplete="off" />
+						</span>
+					</div>
+					<?php
 				}
 
 				if ( 'location' === $filter && ! empty( $this->filter_terms['wsuwp_university_location'] ) ) {
