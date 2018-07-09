@@ -4,7 +4,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	/**
 	 * @var string Script version for cache breaking.
 	 */
-	public $script_version = '1.2.3';
+	public $script_version = '1.2.4';
 
 	/**
 	 * @var array A list of defaults specific to people that will override the
@@ -32,6 +32,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'category_filter_label' => 'Filter by category',
 		'website_link_text' => 'Website',
 		'link' => '',
+		'nid' => '',
 	);
 
 	/**
@@ -71,7 +72,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			return '<!-- wsuwp_people ERROR - an empty host was supplied -->';
 		}
 
-		if ( ! empty( $atts['filters'] ) ) {
+		if ( ! empty( $atts['filters'] ) && empty( $atts['nid'] ) ) {
 			wp_enqueue_style( 'wsuwp-people-filter', plugins_url( 'css/filters.css', dirname( __FILE__ ) ), array(), $this->script_version );
 			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
 		}
@@ -83,19 +84,26 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		}
 
 		$request_url = esc_url( $site_url['host'] . $site_url['path'] . $this->default_path ) . $atts['query'];
-		$request_url = $this->build_taxonomy_filters( $atts, $request_url );
 
-		if ( $atts['count'] ) {
-			$count = ( 200 < absint( $atts['count'] ) ) ? 200 : $atts['count'];
+		if ( $atts['nid'] ) {
 			$request_url = add_query_arg( array(
-				'per_page' => absint( $count ),
+				'wsu_nid' => sanitize_text_field( $atts['nid'] ),
 			), $request_url );
-		}
+		} else {
+			$request_url = $this->build_taxonomy_filters( $atts, $request_url );
 
-		if ( ! empty( $atts['classification'] ) ) {
-			$request_url = add_query_arg( array(
-				'filter[classification]' => sanitize_key( $atts['classification'] ),
-			), $request_url );
+			if ( $atts['count'] ) {
+				$count = ( 200 < absint( $atts['count'] ) ) ? 200 : $atts['count'];
+				$request_url = add_query_arg( array(
+					'per_page' => absint( $count ),
+				), $request_url );
+			}
+
+			if ( ! empty( $atts['classification'] ) ) {
+				$request_url = add_query_arg( array(
+					'filter[classification]' => sanitize_key( $atts['classification'] ),
+				), $request_url );
+			}
 		}
 
 		$response = wp_remote_get( $request_url );
@@ -133,7 +141,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		);
 
 		foreach ( $people as $person ) {
-			if ( ! empty( $atts['filters'] ) ) {
+			if ( ! empty( $atts['filters'] ) && empty( $atts['nid'] ) ) {
 				$last_iteration = ( end( $people ) === $person );
 				$content .= $this->generate_filter_html( $person, $atts, $last_iteration );
 			}
@@ -264,7 +272,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$classes = 'wsuwp-person-container';
 		$classes .= ' ' . $person->slug;
 
-		if ( ! empty( $atts['filters'] ) && ! empty( $person->taxonomy_terms ) ) {
+		if ( ! empty( $atts['filters'] ) && empty( $atts['nid'] ) && ! empty( $person->taxonomy_terms ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
 				$prefix = ( 'wsuwp_university_org' === $taxonomy ) ? 'organization' : array_pop( explode( '_', $taxonomy ) );
 				foreach ( $terms as $term ) {
@@ -444,14 +452,14 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			foreach ( $filters as $filter ) {
 
 				if ( 'search' === $filter ) {
-				?>
-				<div class="wsuwp-people-filter search">
-					<label>
-						<span class="screen-reader-text">Start typing to search</span>
-						<input type="search" value="" placeholder="<?php echo esc_attr( $atts['search_filter_label'] ); ?>" autocomplete="off" />
-					</span>
-				</div>
-				<?php
+					?>
+					<div class="wsuwp-people-filter search">
+						<label>
+							<span class="screen-reader-text">Start typing to search</span>
+							<input type="search" value="" placeholder="<?php echo esc_attr( $atts['search_filter_label'] ); ?>" autocomplete="off" />
+						</span>
+					</div>
+					<?php
 				}
 
 				if ( 'location' === $filter && ! empty( $this->filter_terms['wsuwp_university_location'] ) ) {
