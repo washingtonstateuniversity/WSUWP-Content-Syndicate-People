@@ -92,7 +92,9 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 			$nid = $atts['nid'];
 
+		// @codingStandardsIgnoreStart input sanitized below
 		} elseif ( 'profile' === $atts['output'] && isset( $_REQUEST['nid'] ) ) {
+		// @codingStandardsIgnoreEnd
 
 			$nid_id = sanitize_text_field( $_REQUEST['nid'] );
 
