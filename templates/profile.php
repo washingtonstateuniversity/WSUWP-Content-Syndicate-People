@@ -2,7 +2,7 @@
 
 /**
  * Template for single profile view
- * 
+ *
  * @param string $photo Profile image
  * @param string $name Person name
  * @param array $titles Position titles
