@@ -79,21 +79,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
 		}
 
-		$content = $this->get_content_cache( $atts, 'wsuwp_people' );
-
-		if ( $content ) {
-			return $content;
-		}
-
-		$request_url = esc_url( $site_url['host'] . $site_url['path'] . $this->default_path ) . $atts['query'];
-
-		// Set the value for $nid. If has attr value use that, If output is profile AND a dynamic nid value is present use that, otherwise false.
-		if ( ! empty( $atts['nid'] ) ) {
-
-			$nid = $atts['nid'];
-
-		// @codingStandardsIgnoreStart input sanitized below
-		} elseif ( 'profile' === $atts['output'] && isset( $_REQUEST['nid'] ) ) {
+		if ( 'profile' === $atts['output'] && empty( $atts['nid'] ) && isset( $_REQUEST['nid'] ) ) {
 		// @codingStandardsIgnoreEnd
 
 			$nid_id = sanitize_text_field( $_REQUEST['nid'] );
@@ -102,17 +88,24 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			// TODO check how WP handles search input.
 			$nid = esc_html( str_replace( array( '&', '?', '=', '[', ']', ',' ), '', $nid_id ) );
 
-		} else {
+			// Add nid to atts
+			$atts['nid'] = $nid;
 
-			$nid = false;
+		} // End if
 
-		}// End if
+		$content = $this->get_content_cache( $atts, 'wsuwp_people' );
 
-		if ( $nid ) {
+		if ( $content ) {
+			return $content;
+		}
+
+		$request_url = esc_url( $site_url['host'] . $site_url['path'] . $this->default_path ) . $atts['query'];
+
+		if ( $atts['nid'] ) {
 			$request_url = add_query_arg( array(
-				'wsu_nid' => sanitize_text_field( $nid ),
+				'wsu_nid' => sanitize_text_field( $atts['nid'] ),
 			), $request_url );
-		} elseif ( 'profile' === $atts['output'] && empty( $nid ) ) {
+		} elseif ( 'profile' === $atts['output'] && empty( $atts['nid'] ) ) {
 			// Stop if trying to display profile but no nid - otherwise it will query unrelated profiles.
 			// TODO probably a better way to handle this.
 			return '';
