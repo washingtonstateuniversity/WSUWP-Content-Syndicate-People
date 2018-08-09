@@ -20,19 +20,21 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @var array A set of default attributes for this shortcode only.
 	 */
 	public $local_extended_atts = array(
-		'classification' => '',
-		'display_fields' => 'photo,name,title,office,email',
-		'photo_size' => 'thumbnail',
-		'filters' => '',
-		'search_filter_label' => 'Type to search',
-		'location_filter_label' => 'Filter by location',
-		'organization_filter_label' => 'Filter by organization',
+		'classification'              => '',
+		'display_fields'              => 'photo,name,title,office,email',
+		'photo_size'                  => 'thumbnail',
+		'filters'                     => '',
+		'search_filter_label'         => 'Type to search',
+		'location_filter_label'       => 'Filter by location',
+		'organization_filter_label'   => 'Filter by organization',
 		'classification_filter_label' => 'Filter by classification',
-		'tag_filter_label' => 'Filter by tag',
-		'category_filter_label' => 'Filter by category',
-		'website_link_text' => 'Website',
-		'link' => '',
-		'nid' => '',
+		'tag_filter_label'            => 'Filter by tag',
+		'category_filter_label'       => 'Filter by category',
+		'website_link_text'           => 'Website',
+		'link'                        => '',
+		'nid'                         => '',
+		'profile_page_url'            => '', // Link to dynamic profile page
+		'heading_tag'                 => 'h2', // Heading tag used on profile page
 	);
 
 	/**
@@ -77,6 +79,21 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
 		}
 
+		// @codingStandardsIgnoreStart
+		if ( 'profile' === $atts['output'] && empty( $atts['nid'] ) && isset( $_REQUEST['nid'] ) ) {
+		// @codingStandardsIgnoreEnd
+
+			$nid_id = sanitize_text_field( $_REQUEST['nid'] );
+
+			// Remove query string chars just to be sure someone doesn't throw in extra stuff and then escape.
+			// TODO check how WP handles search input.
+			$nid = esc_html( str_replace( array( '&', '?', '=', '[', ']', ',' ), '', $nid_id ) );
+
+			// Add nid to atts
+			$atts['nid'] = $nid;
+
+		} // End if
+
 		$content = $this->get_content_cache( $atts, 'wsuwp_people' );
 
 		if ( $content ) {
@@ -89,6 +106,11 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			$request_url = add_query_arg( array(
 				'wsu_nid' => sanitize_text_field( $atts['nid'] ),
 			), $request_url );
+		} elseif ( 'profile' === $atts['output'] && empty( $atts['nid'] ) ) {
+			// Stop if trying to display profile but no nid - otherwise it will query unrelated profiles.
+			// TODO probably a better way to handle this.
+			return '';
+
 		} else {
 			$request_url = $this->build_taxonomy_filters( $atts, $request_url );
 
@@ -327,6 +349,35 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$email = ( ! empty( $person->email_alt ) ) ? $person->email_alt : $person->email;
 		$phone = ( ! empty( $person->phone_alt ) ) ? $person->phone_alt : $person->phone;
 
+		$website = $person->website;
+
+		// Set the bio if needed.
+		// TODO The var $bio is uses and set below for the link. It would be worth while to consolidate these to only set the bio once.
+
+		$bio_fields = array_intersect( array( 'bio', 'bio-unit', 'bio-university' ), $display_fields );
+
+		$about = '';
+
+		// Check which bio to display if has fields or is profile. Default is $person->content->rendered
+		if ( ! empty( $bio_fields ) || 'profile' === $atts['output'] ) {
+
+			if ( in_array( 'bio-unit', $display_fields, true ) ) {
+
+				$about = isset( $person->bio_unit ) ? $person->bio_unit : '';
+
+			} elseif ( in_array( 'bio-university', $display_fields, true ) ) {
+
+				$about = isset( $person->bio_university ) ? $person->bio_university : '';
+
+			} else {
+
+				$about = $person->content->rendered;
+
+			} // End if
+		} // End if
+
+		$name = $person->title->rendered;
+
 		// Set up profile URL.
 		$link = false;
 
@@ -349,7 +400,27 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			} elseif ( 'yes' === $atts['link'] ) {
 				$link = $person->link;
 			}
-		}
+		} elseif ( ! empty( $atts['link'] ) && ! empty( $atts['profile_page_url'] ) ) {
+
+			// If has link attr and has profile_page_url -> link to dynamic profile page
+
+			$profile_link = $atts['profile_page_url'] . '?nid=' . $person->nid;
+
+			if ( 'has-bio' === $atts['link'] ) {
+
+				$bio = $person->content->rendered;
+
+				if ( ! empty( $bio ) ) {
+
+					$link = $profile_link;
+
+				} // End if
+			} elseif ( 'yes' === $atts['link'] ) {
+
+				$link = $profile_link;
+
+			} // End if
+		} // End if
 
 		if ( 'basic' === $type ) {
 			ob_start();
@@ -408,15 +479,33 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				</div>
 				<?php } ?>
 
+				<?php if ( ! empty( $about ) ) { ?>
+				<div class="wsuwp-person-bio">
+					<?php echo wp_kses_post( $about ); ?>
+				</div>
+				<?php } ?>
+
 			</div>
 			<?php
 			$html = ob_get_contents();
 			ob_end_clean();
 
 			return $html;
-		}
+		} elseif ( 'profile' === $type ) {
 
-		return apply_filters( 'wsuwp_people_item_html', '', $person, $type );
+			$heading_tag = ( ! empty( $atts['heading_tag'] ) ) ? $atts['heading_tag'] : 'h2';
+
+			ob_start();
+
+			include dirname( __DIR__ ) . '/templates/profile.php';
+
+			$html = ob_get_clean();
+
+			return $html;
+
+		} // End if
+
+		return apply_filters( 'wsuwp_people_item_html', '', $person, $type, $atts );
 	}
 
 	/**
