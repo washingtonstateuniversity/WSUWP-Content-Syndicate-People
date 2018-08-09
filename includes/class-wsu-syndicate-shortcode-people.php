@@ -79,6 +79,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			wp_enqueue_script( 'wsuwp-people-filter', plugins_url( 'js/filters.min.js', dirname( __FILE__ ) ), array( 'jquery' ), $this->script_version, true );
 		}
 
+		// @codingStandardsIgnoreStart
 		if ( 'profile' === $atts['output'] && empty( $atts['nid'] ) && isset( $_REQUEST['nid'] ) ) {
 		// @codingStandardsIgnoreEnd
 
