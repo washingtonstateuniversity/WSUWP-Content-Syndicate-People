@@ -4,7 +4,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	/**
 	 * @var string Script version for cache breaking.
 	 */
-	public $script_version = '1.2.4';
+	public $script_version = '1.2.5';
 
 	/**
 	 * @var array A list of defaults specific to people that will override the
