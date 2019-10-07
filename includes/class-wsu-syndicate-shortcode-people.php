@@ -328,6 +328,10 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			$photo = $person->profile_photo;
 		}
 
+		if ( $photo ) {
+			$classes .= ' profile-has-photo';
+		}
+
 		// Get the display title(s).
 		if ( ! empty( $person->working_titles ) ) {
 			if ( ! empty( $person->display_title ) ) {
