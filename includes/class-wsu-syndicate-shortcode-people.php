@@ -24,6 +24,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'display_fields'              => 'photo,name,title,office,email',
 		'photo_size'                  => 'thumbnail',
 		'filters'                     => '',
+		'bg_image'                    => '',
 		'search_filter_label'         => 'Type to search',
 		'location_filter_label'       => 'Filter by location',
 		'organization_filter_label'   => 'Filter by organization',
@@ -432,7 +433,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			<div class="<?php echo esc_attr( $classes ); ?>">
 
 				<?php if ( $photo && in_array( 'photo', $display_fields, true ) ) { ?>
-					<figure class="wsuwp-person-photo" aria-hidden="true">
+				<figure class="wsuwp-person-photo" aria-hidden="true" <?php if ( ! empty( $atts['bg_image'] ) ) : ?>style="background-image:url(<?php echo esc_url( $photo ); ?>)"<?php endif; ?>>
 						<?php if ( $link ) { ?><a href="<?php echo esc_url( $link ); ?>"><?php } ?>
 						<img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $person->title->rendered ); ?>" />
 						<?php if ( $link ) { ?></a><?php } ?>
