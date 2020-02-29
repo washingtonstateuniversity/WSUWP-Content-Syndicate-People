@@ -22,20 +22,20 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	public $local_extended_atts = array(
 		'classification'              => '',
 		'display_fields'              => 'photo,name,title,office,email',
-		'photo_size'                  => 'thumbnail',
+		'photo_size'                 => 'thumbnail',
 		'filters'                     => '',
-		'bg_image'                    => '',
+		'bg_image'                   => '',
 		'search_filter_label'         => 'Type to search',
 		'location_filter_label'       => 'Filter by location',
 		'organization_filter_label'   => 'Filter by organization',
-		'classification_filter_label' => 'Filter by classification',
+		'classification_filter_label'  => 'Filter by classification',
 		'tag_filter_label'            => 'Filter by tag',
 		'category_filter_label'       => 'Filter by category',
-		'website_link_text'           => 'Website',
-		'link'                        => '',
-		'nid'                         => '',
+		'website_link_text'          => 'Website',
+		'link'                       => '',
+		'nid'                        => '',
 		'profile_page_url'            => '', // Link to dynamic profile page
-		'heading_tag'                 => 'h2', // Heading tag used on profile page
+		'heading_tag'                => 'h2', // Heading tag used on profile page
 		'wrapper_class_name'         => 'wsuwp-people-wrapper',
 		'items_per_row'              => '4'
 	);
@@ -98,6 +98,8 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		} // End if
 
 		$content = $this->get_content_cache( $atts, 'wsuwp_people' );
+
+		$content = false;
 
 		if ( $content ) {
 			return $content;
