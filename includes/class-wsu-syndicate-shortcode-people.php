@@ -36,6 +36,8 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'nid'                         => '',
 		'profile_page_url'            => '', // Link to dynamic profile page
 		'heading_tag'                 => 'h2', // Heading tag used on profile page
+		'wrapper_class_name'         => 'wsuwp-people-wrapper',
+		'items_per_row'              => '4'
 	);
 
 	/**
@@ -141,7 +143,15 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			return '';
 		}
 
-		$content = '<div class="wsuwp-people-wrapper">';
+		$wrapper_class = $atts['wrapper_class_name'];
+
+		if ( 'card' === $atts['output'] ){
+
+			$wrapper_class .= ' wsu-c-card__items-row--' . $atts['items_per_row'];
+
+		}
+
+		$content = '<div class="' . $wrapper_class . '">';
 
 		$people = json_decode( $data );
 
@@ -503,6 +513,16 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			ob_start();
 
 			include dirname( __DIR__ ) . '/templates/profile.php';
+
+			$html = ob_get_clean();
+
+			return $html;
+
+		} elseif ( 'card' === $type ) {
+
+			ob_start();
+
+			include dirname( __DIR__ ) . '/templates/card.php';
 
 			$html = ob_get_clean();
 
