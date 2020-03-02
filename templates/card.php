@@ -3,40 +3,42 @@
 	<div class="wsu-c-card__container">
 		<div class="wsu-c-card__content">
 			<?php if (!empty($photo)) : ?>
-				<div class="wsu-c-card__photo-frame">
-					<img class="wsu-c-card__photo" src="<?php echo $photo; ?>" alt="#" data-object-fit>
-				</div>
+				<figure class="wsu-c-card__photo-frame">
+					<img class="wsu-c-card__photo" src="<?php echo $photo; ?>" alt="Photo of <?php echo esc_attr( $name ); ?>" data-object-fit>
+				</figure>
 			<?php endif; ?>
 
-			<?php if (!empty($person->first_name) && !empty($person->last_name)) : ?>
-				<h3 class="wsu-c-card__heading"><?php echo $person->first_name; ?> <?php echo $person->last_name; ?></h3>
+			<?php if (!empty($name)) : ?>
+				<?php echo $opening_heading_tag . esc_html( $name ) . $closing_heading_tag; ?>
 			<?php endif; ?>
 
-			<?php if (!empty($person->position_title)) : ?>
-				<p class="wsu-c-card__description"><?php echo $person->position_title; ?></p>
+			<?php if ( !empty($titles) ) : ?>
+				<?php foreach ( $titles as $title ) : ?>
+					<p class="wsu-c-card__description"><?php echo esc_html( $title ); ?></p>
+				<?php endforeach; ?>
 			<?php endif; ?>
 
-			<?php if (!empty($person->address)) : ?>
+			<?php if (!empty($address)) : ?>
 				<div class="wsu-c-card__address">
-					<span class="wsu-c-card__address-line-1"><?php echo $person->address; ?></span>
+					<span class="wsu-c-card__address-line-1"><?php echo $address; ?></span>
 				</div>
 			<?php endif; ?>
 
-			<?php if (!empty($person->phone)) : ?>
+			<?php if (!empty($phone)) : ?>
 				<div class="wsu-c-card__phone">
-					<a href="tel:<?php echo $person->phone; ?>" class="wsu-c-card__phone-link"><?php echo $person->phone; ?></a>
+					<a href="tel:<?php echo esc_html( $phone ); ?>" class="wsu-c-card__phone-link"><?php echo esc_html( $phone ); ?></a>
 				</div>
 			<?php endif; ?>
 
-			<?php if (!empty($person->email)) : ?>
+			<?php if (!empty($email)) : ?>
 				<div class="wsu-c-card__email">
-					<a href="mailto:<?php echo $person->email; ?>" class="wsu-c-card__email-link"><?php echo $person->email; ?></a>
+					<a href="mailto:<?php echo esc_attr( $email ); ?>" class="wsu-c-card__email-link"><?php echo esc_attr( $email ); ?></a>
 				</div>
 			<?php endif; ?>
 
-			<?php if (!empty($person->website)) : ?>
+			<?php if (!empty($website)) : ?>
 				<div class="wsu-c-card__website">
-					<a href="<?php echo $person->website; ?>" class="wsu-c-card__website-link">Website</a>
+					<a href="<?php echo esc_url( $website ); ?>" class="wsu-c-card__website-link">Website</a>
 				</div>
 			<?php endif; ?>
 		</div>
