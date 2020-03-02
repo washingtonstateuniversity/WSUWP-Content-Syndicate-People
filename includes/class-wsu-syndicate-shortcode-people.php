@@ -149,7 +149,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		if ( 'card' === $atts['output'] ){
 
-			$wrapper_class .= ' wsu-c-card__items-per-row--' . $atts['items_per_row'];
+			$wrapper_class .= ' wsu-c-cards__items-per-row--' . $atts['items_per_row'];
 
 		}
 
