@@ -522,6 +522,11 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		} elseif ( 'card' === $type ) {
 
+			$heading_tag = ( ! empty( $atts['heading_tag'] ) ) ? $atts['heading_tag'] : 'h3';
+
+			$opening_heading_tag = '<' . esc_html($heading_tag) . ' class="wsu-c-card__heading">';
+			$closing_heading_tag = '</' . esc_html($heading_tag) . '>';
+
 			ob_start();
 
 			include dirname( __DIR__ ) . '/templates/card.php';
