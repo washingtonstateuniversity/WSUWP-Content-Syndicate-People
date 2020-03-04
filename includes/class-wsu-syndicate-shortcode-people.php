@@ -99,8 +99,6 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		$content = $this->get_content_cache( $atts, 'wsuwp_people' );
 
-		$content = false;
-
 		if ( $content ) {
 			return $content;
 		}
@@ -145,12 +143,11 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			return '';
 		}
 
+		// Set wrapper class names
 		$wrapper_class = $atts['wrapper_class_name'];
 
 		if ( 'card' === $atts['output'] ){
-
 			$wrapper_class .= ' wsu-c-cards__items-per-row--' . $atts['items_per_row'];
-
 		}
 
 		$content = '<div class="' . $wrapper_class . '">';
@@ -339,6 +336,11 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		// Get the legacy profile photo URL if the person's collection is empty.
 		if ( ! $photo && isset( $person->profile_photo ) ) {
 			$photo = $person->profile_photo;
+		}
+
+		// If all else fails, let's set a default placeholder image
+		if ( empty($photo) ) {
+			$photo = plugins_url() . '/WSUWP-Content-Syndicate-People/images/coug-head-placeholder.png';
 		}
 
 		if ( $photo ) {
