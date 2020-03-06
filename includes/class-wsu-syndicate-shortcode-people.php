@@ -22,20 +22,22 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	public $local_extended_atts = array(
 		'classification'              => '',
 		'display_fields'              => 'photo,name,title,office,email',
-		'photo_size'                  => 'thumbnail',
+		'photo_size'                 => 'thumbnail',
 		'filters'                     => '',
-		'bg_image'                    => '',
+		'bg_image'                   => '',
 		'search_filter_label'         => 'Type to search',
 		'location_filter_label'       => 'Filter by location',
 		'organization_filter_label'   => 'Filter by organization',
-		'classification_filter_label' => 'Filter by classification',
+		'classification_filter_label'  => 'Filter by classification',
 		'tag_filter_label'            => 'Filter by tag',
 		'category_filter_label'       => 'Filter by category',
-		'website_link_text'           => 'Website',
-		'link'                        => '',
-		'nid'                         => '',
+		'website_link_text'          => 'Website',
+		'link'                       => '',
+		'nid'                        => '',
 		'profile_page_url'            => '', // Link to dynamic profile page
-		'heading_tag'                 => 'h2', // Heading tag used on profile page
+		'heading_tag'                => 'h2', // Heading tag used on profile page
+		'wrapper_class_name'         => 'wsuwp-people-wrapper',
+		'items_per_row'              => '4'
 	);
 
 	/**
@@ -141,7 +143,14 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			return '';
 		}
 
-		$content = '<div class="wsuwp-people-wrapper">';
+		// Set wrapper class names
+		$wrapper_class = $atts['wrapper_class_name'];
+
+		if ( 'card' === $atts['output'] ){
+			$wrapper_class .= ' wsu-c-cards__items-per-row--' . $atts['items_per_row'];
+		}
+
+		$content = '<div class="' . $wrapper_class . '">';
 
 		$people = json_decode( $data );
 
@@ -329,6 +338,11 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			$photo = $person->profile_photo;
 		}
 
+		// If all else fails, let's set a default placeholder image
+		if ( empty($photo) ) {
+			$photo = plugins_url() . '/WSUWP-Content-Syndicate-People/images/coug-head-placeholder.png';
+		}
+
 		if ( $photo ) {
 			$classes .= ' profile-has-photo';
 		}
@@ -503,6 +517,21 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			ob_start();
 
 			include dirname( __DIR__ ) . '/templates/profile.php';
+
+			$html = ob_get_clean();
+
+			return $html;
+
+		} elseif ( 'card' === $type ) {
+
+			$heading_tag = ( ! empty( $atts['heading_tag'] ) ) ? $atts['heading_tag'] : 'h3';
+
+			$opening_heading_tag = '<' . esc_html($heading_tag) . ' class="wsu-c-card__heading">';
+			$closing_heading_tag = '</' . esc_html($heading_tag) . '>';
+
+			ob_start();
+
+			include dirname( __DIR__ ) . '/templates/card.php';
 
 			$html = ob_get_clean();
 
