@@ -24,6 +24,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'display_fields'              => 'photo,name,title,office,email',
 		'photo_size'                  => 'thumbnail',
 		'filters'                     => '',
+		'exclude_term_values'         => '',
 		'bg_image'                    => '',
 		'search_filter_label'         => 'Type to search',
 		'location_filter_label'       => 'Filter by location',
@@ -525,7 +526,10 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @return string The generated HTML for filter inputs.
 	 */
 	private function generate_filter_html( $person, $atts, $last_iteration ) {
+
 		$filters = array_map( 'trim', explode( ',', $atts['filters'] ) );
+
+		$exclude_terms = array_map( 'trim', explode( ',', $atts['exclude_term_values'] ) );
 
 		if ( ! empty( array_intersect( array( 'location', 'organization', 'category', 'tag', 'classification' ), $filters ) ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
@@ -557,19 +561,19 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				}
 
 				if ( 'location' === $filter && ! empty( $this->filter_terms['wsuwp_university_location'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_location'], $atts['location_filter_label'] );
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_location'], $atts['location_filter_label'], $exclude_terms );
 				}
 
 				if ( 'organization' === $filter && ! empty( $this->filter_terms['wsuwp_university_org'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_org'], $atts['organization_filter_label'] );
+					$this->term_options_html( $filter, $this->filter_terms['wsuwp_university_org'], $atts['organization_filter_label'], $exclude_terms );
 				}
 
 				if ( 'classification' === $filter && ! empty( $this->filter_terms['classification'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['classification'], $atts['classification_filter_label'] );
+					$this->term_options_html( $filter, $this->filter_terms['classification'], $atts['classification_filter_label'], $exclude_terms );
 				}
 
 				if ( 'tag' === $filter && ! empty( $this->filter_terms['post_tag'] ) ) {
-					$this->term_options_html( $filter, $this->filter_terms['post_tag'], $atts['tag_filter_label'] );
+					$this->term_options_html( $filter, $this->filter_terms['post_tag'], $atts['tag_filter_label'], $exclude_terms );
 				}
 
 				if ( 'category' === $filter ) {
@@ -577,7 +581,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 					$categories = array_unique( $categories );
 
 					if ( ! empty( $categories ) ) {
-						$this->term_options_html( $filter, $categories, $atts['category_filter_label'] );
+						$this->term_options_html( $filter, $categories, $atts['category_filter_label'], $exclude_terms );
 					}
 				}
 			}
@@ -599,19 +603,23 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @param string $taxonomy The taxonomy to output terms for.
 	 * @param string $label    Label text.
 	 */
-	private function term_options_html( $option, $taxonomy, $label ) {
+	private function term_options_html( $option, $taxonomy, $label, $exclude_terms ) {
 		ksort( $taxonomy );
 		?>
 		<div class="wsuwp-people-filter <?php echo esc_attr( $option ); ?>">
 			<button type="button" class="wsuwp-people-filter-label" aria-expanded="false"><?php echo esc_html( $label ); ?></button>
 			<ul class="wsuwp-people-filter-terms">
-				<?php foreach ( $taxonomy as $slug => $name ) { ?>
+				<?php foreach ( $taxonomy as $slug => $name ) {
+					$term_key = esc_attr( $option ) . '-' . esc_attr( $slug );
+					?>
+				<?php if ( ! in_array( $term_key, $exclude_terms, true ) ) : ?>
 				<li>
 					<label>
 						<input type="checkbox" value="<?php echo esc_attr( $option ) . '-' . esc_attr( $slug ); ?>">
 						<span><?php echo esc_html( $name ); ?></span>
 					</label>
 				</li>
+				<?php endif; ?>
 				<?php } ?>
 			</ul>
 		</div>
