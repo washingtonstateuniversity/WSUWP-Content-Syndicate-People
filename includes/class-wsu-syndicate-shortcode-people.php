@@ -545,7 +545,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 			ob_start();
 			?>
-			<div class="wsuwp-people-filters">
+			<div class="wsuwp-people-filters" data-filters="<?php echo implode( ',', $filters ) ?>">
 			<?php
 			foreach ( $filters as $filter ) {
 
