@@ -15,7 +15,7 @@
  * @param string $heading_tag Tag to use for profile name
  */
 
-?><div class="card">
+?><div class="card wsuwp-person-profile">
 	<?php if ( $photo ) : ?>
 	<figure class="photo">
 		<img src="<?php echo esc_url( $photo ); ?>"
