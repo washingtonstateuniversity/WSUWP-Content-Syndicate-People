@@ -37,6 +37,8 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'nid'                         => '',
 		'profile_page_url'            => '', // Link to dynamic profile page
 		'heading_tag'                 => 'h2', // Heading tag used on profile page
+		'source'                      => '',
+		'endpoint'                    => '',
 	);
 
 	/**
@@ -102,11 +104,22 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 			return $content;
 		}
 
-		$request_url = esc_url( $site_url['host'] . $site_url['path'] . $this->default_path ) . $atts['query'];
+		$api_path = ( ! empty( $atts['path'] ) ) ? trailingslashit( $atts['path'] ) : $this->default_path;
+
+		$site_source = $site_url['host'] . $site_url['path'];
+
+		$api_source = ( ! empty( $atts['source'] ) ) ? trailingslashit( $atts['source'] ) : $site_source;
+
+		$request_url = esc_url( $api_source . $api_path ) . $atts['query'];
+
+
 
 		if ( $atts['nid'] ) {
+
+			$nid_key = ( 'api' === $atts['endpoint'] ) ? 'nid' : 'wsu_nid';
+
 			$request_url = add_query_arg( array(
-				'wsu_nid' => sanitize_text_field( $atts['nid'] ),
+				$nid_key => sanitize_text_field( $atts['nid'] ),
 			), $request_url );
 		} elseif ( 'profile' === $atts['output'] && empty( $atts['nid'] ) ) {
 			// Stop if trying to display profile but no nid - otherwise it will query unrelated profiles.
@@ -294,7 +307,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 		// Build out the profile container classes.
 		$classes = 'wsuwp-person-container';
-		$classes .= ' ' . $person->slug;
+		$classes .= ( 'api' === $atts['endpoint'] ) ? 'person-'  . $person->post_id : ' ' . $person->slug;
 
 		if ( ! empty( $atts['filters'] ) && empty( $atts['nid'] ) && ! empty( $person->taxonomy_terms ) ) {
 			foreach ( $person->taxonomy_terms as $taxonomy => $terms ) {
@@ -324,6 +337,19 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				$photo = $photo_collection[0]->$photo_size;
 			}
 		}
+
+		if ( empty( $photo ) && ( 'api' === $atts['endpoint'] ) && isset( $person->photo ) ) {
+
+			$photo = $person->photo;
+
+		}
+
+		if ( 'api' === $atts['endpoint'] ) {
+
+			$photo = ( empty( $photo ) && isset( $person->photo ) ) ? $person->photo : $photo;
+			$person->position_title = ( isset( $person->title ) ) ? $person->title[0] : array();
+		}
+
 
 		// Get the legacy profile photo URL if the person's collection is empty.
 		if ( ! $photo && isset( $person->profile_photo ) ) {
@@ -377,12 +403,12 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 			} else {
 
-				$about = $person->content->rendered;
+				$about = ( 'api' === $atts['endpoint'] ) ? $person->bio : $person->content->rendered;
 
 			} // End if
 		} // End if
 
-		$name = $person->title->rendered;
+		$name = ( 'api' === $atts['endpoint'] ) ? $person->name : $person->title->rendered;
 
 		// Set up profile URL.
 		$link = false;
