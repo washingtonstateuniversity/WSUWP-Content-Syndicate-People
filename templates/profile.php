@@ -32,11 +32,11 @@
 			}
 		}
 		?>
-		<span class="email"><a href="mailto:<?php echo esc_attr( $email ); ?>">
+		<?php if ( ! empty( $email ) ) : ?><span class="email"><a href="mailto:<?php echo esc_attr( $email ); ?>">
 			<?php echo esc_html( $email ); ?></a>
-		</span>
-		<span class="phone"><?php echo esc_html( $phone ); ?></span>
-		<span class="office"><?php echo esc_html( $office ); ?></span>
+		</span><?php endif; ?>
+		<?php if ( ! empty( $phone ) ) : ?><span class="phone"><?php echo esc_html( $phone ); ?></span><?php endif; ?>
+		<?php if ( ! empty( $office ) ) : ?><span class="office"><?php echo esc_html( $office ); ?></span><?php endif; ?>
 		<?php if ( ! empty( $address ) ) : ?>
 		<span class="address"><?php echo esc_html( $address ); ?></span>
 		<?php endif ?>
