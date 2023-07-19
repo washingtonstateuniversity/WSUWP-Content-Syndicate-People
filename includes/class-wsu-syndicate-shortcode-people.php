@@ -403,7 +403,7 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 
 			} else {
 
-				$about = ( 'api' === $atts['endpoint'] ) ? $person->bio : $person->content->rendered;
+				$about = ( 'api' === $atts['endpoint'] ) ? htmlspecialchars_decode( $person->bio ) : $person->content->rendered;
 
 			} // End if
 		} // End if
