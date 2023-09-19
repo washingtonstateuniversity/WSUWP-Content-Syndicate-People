@@ -45,6 +45,14 @@
 			<a href="<?php echo esc_url( $website ); ?>"><?php echo esc_url( $website ); ?></a>
 		</span>
 		<?php endif ?>
+		<?php if ( ! empty( $cv ) ) : ?>
+		<span class="cv"><a href="<?php echo esc_url( $cv ); ?>">View CV</a>
+		</span>
+		<?php endif ?>
+		<?php if ( ! empty( $google_scholars ) ) : ?>
+		<span class="google-scholars"><a href="<?php echo esc_url( $google_scholars ); ?>">View Google Scholars Profile</a>
+		</span>
+		<?php endif ?>
 	</div>
 </div>
 
