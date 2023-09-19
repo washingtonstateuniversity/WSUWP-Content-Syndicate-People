@@ -52,6 +52,7 @@
 		<?php if ( ! empty( $google_scholars ) ) : ?>
 		<span class="google-scholars"><a href="<?php echo esc_url( $google_scholars ); ?>">View Google Scholars Profile</a>
 		</span>
+		<?php endif ?>
 		<?php if ( ! empty( $lab_website ) ) : ?>
 		<span class="lab-website"><a href="<?php echo esc_url( $lab_website ); ?>"><?php echo wp_kses_post( $lab_website_name ); ?></a>
 		</span>
