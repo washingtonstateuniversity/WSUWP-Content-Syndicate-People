@@ -381,8 +381,10 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$email = ( ! empty( $person->email_alt ) ) ? $person->email_alt : $person->email;
 		$phone = ( ! empty( $person->phone_alt ) ) ? $person->phone_alt : $person->phone;
 
-		$cv 			 = ( ! empty( $person->cv ) ) ? $person->cv : '';
-		$google_scholars = ( ! empty( $person->google_scholar_id ) ) ? $person->google_scholar_id : '';
+		$cv               = ( ! empty( $person->cv ) ) ? $person->cv : '';
+		$google_scholars  = ( ! empty( $person->google_scholar_id ) ) ? $person->google_scholar_id : '';
+		$lab_website      = ( ! empty( $person->lab_website ) && ! empty( $person->lab_website->url ) ) ? $person->lab_website->url : '';
+		$lab_website_name = ( ! empty( $person->lab_website ) && ! empty( $person->lab_website->name ) ) ? $person->lab_website->name : 'View Lab Website';
 
 		$website = $person->website;
 
