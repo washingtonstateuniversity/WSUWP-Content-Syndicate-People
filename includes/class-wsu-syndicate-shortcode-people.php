@@ -39,6 +39,9 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		'heading_tag'                 => 'h2', // Heading tag used on profile page
 		'source'                      => '',
 		'endpoint'                    => '',
+		'display_first'               => '', // show these people first
+		'directory'                   => '', // directory id
+		'view_profile'                => '', // link to full profile view
 	);
 
 	/**
@@ -111,8 +114,6 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 		$api_source = ( ! empty( $atts['source'] ) ) ? trailingslashit( $atts['source'] ) : $site_source;
 
 		$request_url = esc_url( $api_source . $api_path ) . $atts['query'];
-
-
 
 		if ( $atts['nid'] ) {
 
@@ -267,7 +268,40 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @return array Sorted items.
 	 */
 	public function sort_items( $people, $atts ) {
+
 		usort( $people, array( $this, 'sort_alpha' ) );
+
+
+		if ( ! empty( $atts['display_first'] ) ) {
+
+			$n_people = array();
+
+			foreach ( $people as $person ) {
+
+				$n_people[ $person->nid ] = $person;
+
+			}
+
+			$ordered_people = array();
+
+			$nids = explode( ',', $atts['display_first'] );
+
+			foreach ( $nids as $nid ) {
+
+				if ( array_key_exists( $nid, $n_people ) ) {
+
+					$ordered_people[ $nid ] = $n_people[ $nid ];
+
+					unset( $n_people[ $nid ] );
+
+				}
+			}
+
+			$people = array_merge( $ordered_people, $n_people  );
+
+
+		}
+
 
 		return apply_filters( 'wsuwp_people_sort_items', $people, $atts );
 	}
@@ -457,6 +491,12 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 				$link = $profile_link;
 
 			} // End if
+		} elseif ( ! empty( $atts['view_profile'] ) ) {
+
+			// If has link attr and has profile_page_url -> link to dynamic profile page
+
+			$link = get_permalink() . '/wsu-profile/' . $person->nid;
+
 		} // End if
 
 		if ( 'basic' === $type ) {

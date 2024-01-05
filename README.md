@@ -22,8 +22,10 @@ This plugin adds the following attributes to shortcodes registered with or exten
 * `link` - Link a person's name and photo to their full profile. Works only when the `host` attribute is being used.
 * `website_link_text` - Link text to display for the `website` field when it is being output. Defaults to `Website`.
 * `nid` - Displays an individual person associated with the given WSU Network ID.
-* `profile_page_url` - Link to dynamic profile page. Allows you to show profiles on your site instead of linking out.
+* `profile_page_url` - (Legacy: see view profile) Link to dynamic profile page. Allows you to show profiles on your site instead of linking out.
+* `view_proflie` - Show profile on page
 * `heading_tag` - HTML tag to use for the profile title. Defaults to `h2`.
+* `display_first` - List of comma-separated nids to display first in order.
 
 ## Example usage
 
