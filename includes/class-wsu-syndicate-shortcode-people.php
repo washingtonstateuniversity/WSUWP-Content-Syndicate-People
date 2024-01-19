@@ -59,8 +59,98 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	}
 
 	public function add_shortcode() {
-		add_shortcode( 'wsuwp_people', array( $this, 'display_shortcode' ) );
+		add_shortcode( 'wsuwp_people', array( $this, 'render_shortcode' ) );
 	}
+
+
+	public function render_shortcode( $atts ) {
+
+		$atts = $this->process_attributes( $atts );
+
+		if ( ! empty( $atts['output'] ) && 'wds' === $atts['output'] ) {
+
+			return $this->display_wds_shortcode( $atts );
+
+		} else {
+
+			return $this->display_shortcode( $atts );
+
+		}
+
+	}
+
+
+	public function display_wds_shortcode( $atts ) {
+
+		wp_register_script( 'wsu_design_system_script_people_list', 'https://cdn.web.wsu.edu/designsystem/2.x/dist/bundles/standalone/people-list/scripts.js', array(), '1.1.0', true );
+		wp_register_script( 'wsu_design_system_script_syndicate', plugin_dir_url( dirname( __FILE__ ) ) . '/js/wds.js', array(), '1.1.0', true );
+
+		// enqueue scripts and styles
+		if ( ! is_admin() ) {
+
+			wp_enqueue_script( 'wsu_design_system_script_people_list' );
+			wp_enqueue_script( 'wsu_design_system_script_syndicate' );
+
+		}
+
+		$data = array(
+			'component-id' => 'id-' . uniqid(),
+			'className' => '',
+			'count' => ( ! empty( $atts['count'] ) ) ? $atts['count'] : '10',
+			'page' => '1',
+			'nid' => '',
+			'classification' => ( ! empty( $atts['classification'] ) ) ? $atts['classification'] : '',
+			'university-category' => '',
+			'university-location' => '',
+			'university-organization' => '',
+			'tag' => '',
+			'profile-order' => ( ! empty( $atts['display_first'] ) ) ? $atts['display_first'] : '',
+			'display-fields' => ( ! empty( $atts['display_fields'] ) ) ? $atts['display_fields'] : 'photo,name,title,office,email',
+			'focus-area-label' => 'Focus Area',
+			'website-link-text' => 'Website',
+			'profile-link' => '',
+			'headingTag' => 'h2',
+			'columns' => '3',
+			'photo-size' => 'medium',
+			'photo-srcset' => '',
+			'filters' => ( ! empty( $atts['filters'] ) ) ? $atts['filters'] : '',
+			'only-show-selected-term-values' => '',
+			'exclude-term-values' => '',
+			'include-term-values' => '',
+			'directory-filter-label' => 'Filter by Area',
+			'directory-filter-terms' => '',
+			'category-filter-label' => 'Filter by Category',
+			'category-filter-terms' => '',
+			'classification-filter-label' => 'Filter by Classification',
+			'classification-filter-terms' => '',
+			'location-filter-label' => 'Filter by Location',
+			'location-filter-terms' => '',
+			'organization-filter-label' => 'Filter by Organization',
+			'organization-filter-terms' => '',
+			'search-filter-label' => 'Type to search',
+			'tag-filter-label' => 'Filter by Tag',
+			'tag-filter-terms' => '',
+			'directory' => ( ! empty( $atts['directory'] ) ) ? $atts['directory'] : '',
+			'exclude-child-directories' => '1',
+			'show-profile' => ( ! empty( $atts['view_profile'] ) ) ? '1' : '',
+			'indexProfiles' => '',
+			'use-custom-profile-link' => '',
+			'custom-profile-link' => '',
+			'base-url' => 'https://people.wsu.edu',
+			'children' => '',
+		);
+
+		$props = array();
+
+		foreach ( $data as $key => $value ) {
+
+			$props[] = 'data-' . $key . '="' . $value . '"';
+		}
+
+		return '<div class="wsu-people-list" ' . implode( ' ', $props ) . ' ></div>';
+
+	}
+
 
 	/**
 	 * Display people from people.wsu.edu in a structured format using the
@@ -73,7 +163,6 @@ class WSU_Syndicate_Shortcode_People extends WSU_Syndicate_Shortcode_Base {
 	 * @return string Content to display in place of the shortcode.
 	 */
 	public function display_shortcode( $atts ) {
-		$atts = $this->process_attributes( $atts );
 
 		$site_url = $this->get_request_url( $atts );
 
