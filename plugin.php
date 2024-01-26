@@ -5,7 +5,7 @@ Plugin URI: https://web.wsu.edu/wordpress/plugins/wsuwp-content-syndicate/
 Description: Retrieve people for display from people.wsu.edu.
 Author: washingtonstateuniversity, jeremyfelt
 Author URI: https://web.wsu.edu/
-Version: 1.5.0
+Version: 1.5.1
 */
 
 namespace WSU\ContentSyndicate\People;
